@@ -1,0 +1,21 @@
+{
+  "name": "assignment-wt1",
+  "version": "1.0.0",
+  "description": "Extract and view User, Group and project details with OAuth.",
+  "main": "server.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.lnu.se/1dv027/student/jk224jv/assignment-wt1"
+  },
+  "keywords": [
+    "OAuth",
+    "API consumption",
+    "REST API",
+    "GraphQL"
+  ],
+  "author": "Jimmy Karlsson",
+  "license": "MIT"
+}

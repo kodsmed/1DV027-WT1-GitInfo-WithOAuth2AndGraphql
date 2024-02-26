@@ -17,3 +17,21 @@ If you're aiming for a higher grade, it's important you choose a design and stru
 Please review [all requirements of the application](../../issues/) including (#1, #2, #3, #4, #5, #6, #7, #8, #9, #10, #11, #12, #13, and #14). Pay special attention to the labels indicating if a requirement is required or optional.
 
 As you implement tasks and add functionality, it is important to create and close issues accordingly.
+
+## Issues
+
+* 1 As a developer, I want the code to be clear and well-structured.
+* 2 As a developer, I want to reuse code. Npm packages and I validate them.
+* 3 As a developer, I want to manage dependencies and organize scripts I use often. Package.json, Manifest etc.
+* 4 The source code in all projects must be documented according to the best practices of the programming language used including line comments. All classes, methods and functions except anonymous functions must be documented. Code hard to understand is documented with line comments.
+* 5 As a developer, I want the source code to follow a coding standard. The code should be es-linted and follow the standard of the programming language used.
+* 6 As a student, I want it to be possible for the examiner to follow the creation of the application. Commits.
+* 7 As an end-user, I want to access the service over the internet. Https must be enforced. The service must be resilient and restart if it crashes. The service must be operational in a "production" environment, ie, no dev packages.
+* 8 As a developer and end-user, I want the keys and tokens to be handled correctly.
+* 9 As a student, I want the examiner to be able to read a complete Assignment Report, provided with correct links. Fill in the Assignment Report. The link to my application is clearly visible.
+* 10 As an end user, I want to be able to login to the application using my gitlab.lnu.se-account.
+* 11 As an end user, I want to be able to see my profile information on the start page. Name, Username, User ID, Email, Avatar, last activity date and time.
+* 12 As an end user, I want to be able to see my 101 latest activities.
+* 13 As an end user, I want to be able to list at most three groups, and at most, five projects, including subgroups, of a specific group, along with the date and author of the most recent commit for each project.
+
+* 14 As a developer, I want to organize the code, making it easier to develop, test and maintain. OPTIONAL.
