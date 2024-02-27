@@ -11,7 +11,7 @@
  * @needs json-extentions.d.ts
  */
 
-
+// Warning: this makes sure its treated as a module. Looks redundant but IS needed.
 export { };
 
 
