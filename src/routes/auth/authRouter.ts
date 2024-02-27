@@ -15,24 +15,25 @@ const port = process.env.EXPRESS_PORT || ""
 const clientId = process.env.GITLAB_CLIENT_ID || ""
 const clientSecret = process.env.GITLAB_CLIENT_SECRET || ""
 const host = process.env.GITLAB_HOST_URL || ""
+
+// The base URL for the redirect URL, by splitting it like this we can easily add the callback path later.
+// Thus allowing us to use the same base URL for additional OAuth2.0 providers, if we want to add more in the future.
 const redirectURLBase = `http://localhost:${port}/auth/`;
 const scopes = ['read_user', 'read_api']
 
+
 authRouter.get('/gitlab', (req, res, next) => {
 // Redirect the user to the OAuth2.0 provider
-const completeRedirectURL = redirectURLBase + 'gitlab-callback/';
+const completeRedirectURL = redirectURLBase + 'gitlab-callback';
 const authURL = `${host}/oauth/authorize?client_id=${clientId}&redirect_uri=${completeRedirectURL}&response_type=code&scope=${scopes.join('%20')}`;
 res.redirect(authURL);
 })
 
-authRouter.get('/otherProvider', (req, res, next) => {
-  // Redirect the user to the OAuth2.0 provider
-  const completeRedirectURL = redirectURLBase + 'other_provider-callback';
-  const authURL = `${host}/oauth/authorize?client_id=${clientId}&redirect_uri=${completeRedirectURL}&response_type=code&scope=${scopes.join('%20')}`;
-  res.redirect(authURL);
-  })
+authRouter.get('/final', (req, res, next) => {
+  res.send('Final page')
+})
 
-authRouter.get('/gitlab-callback/', async (req, res, next) => {
+authRouter.get('/gitlab-callback', async (req, res, next) => {
   // Finish the authentication process and get the tokens, then redirect the user to the home page.
   // Starting by deconstructing the code from the query string
   const { code } = req.query
@@ -43,13 +44,13 @@ authRouter.get('/gitlab-callback/', async (req, res, next) => {
 
   // Create a new OAuthenticator instance
   try {
-    const completeRedirectURL = redirectURLBase + 'gitlab-callback/';
+    const completeRedirectURL = redirectURLBase + '/final';
     const authenticator = new OAuthenticator(clientId, clientSecret, host)
     const authDetails = await authenticator.authenticate(code as string, completeRedirectURL)
     // TODO: Save the tokens and pass them to the user as a session cookie
     // TODO: Remove the console.log and send a proper response
     console.log('Authentication successful', authDetails)
-    res.send('Authentication successful!');
+    res.redirect('./final')
   } catch (error) {
     console.error('Error exchanging code for token', error);
     res.status(500).send('Authentication failed');
