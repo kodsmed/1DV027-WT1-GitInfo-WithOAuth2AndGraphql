@@ -6,7 +6,7 @@
  */
 
 // User-land modules.
-import  '../lib/json-ts-cycle.js'
+import  '../util/json-ts-cycle.js'
 import httpContext from 'express-http-context'
 import { addColors, createLogger, format, transports } from 'winston'
 import * as Transport from 'winston-transport';
