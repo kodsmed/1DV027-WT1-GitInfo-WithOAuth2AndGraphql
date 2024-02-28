@@ -14,5 +14,6 @@ declare module 'express-serve-static-core' {
     code?: string
     token?: string
     refreshToken?: string
+    session: any
   }
 }
