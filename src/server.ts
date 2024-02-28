@@ -11,14 +11,16 @@ import httpContext from 'express-http-context';
 
 // Node built-in modules.
 import { randomUUID } from 'node:crypto'
-import http from 'node:http'
+import http, { Server } from 'node:http'
+import { dirname, join } from 'path'
+import { fileURLToPath } from 'url'
 
 // Package modules.
 import helmet from 'helmet';
 import cors from 'cors';
 import express, { NextFunction, Request, Response } from 'express';
+import session from 'express-session';
 import 'dotenv/config'
-import '@lnu/json-js-cycle'
 import { morganLogger } from './config/morgan.js';
 
 // Application modules.
@@ -26,32 +28,20 @@ import { limiter } from './config/rateLimiter.js'
 import { logger } from './config/winston.js'
 import { router } from './routes/router.js'
 
+// Load configuration settings.
+import { sessionOptions } from './config/sessionOptions.js';
+import { serverOptions } from './config/serverOptions.js';
+
 // Load extended types.
 import ExtendedRequest from './lib/types/req-extentions.js';
 import { ExtendedError } from './lib/types/ExtendedError.js';
+import { AuthDetails } from './lib/types/AuthDetails.js';
 
 // Set up
 try {
   const app = express();
   const port = process.env.EXPRESS_PORT;
-  const applicationID = process.env.GITLAB_CLIENT_ID;
-  const applicationSecret = process.env.GITLAB_CLIENT_SECRET;
-  const host = process.env.GITLAB_HOST_URL;
-  const callbackURL = `http://localhost:${port}/oauth-callback/`;
-  const gitLabAuthURL = `${host}/oauth/authorize`;
-
-  if (!port) {
-    throw new Error('EXPRESS_PORT is not set');
-  }
-  if (!applicationID) {
-    throw new Error('GITLAB_CLIENT_ID is not set');
-  }
-  if (!applicationSecret) {
-    throw new Error('GITLAB_CLIENT_SECRET is not set');
-  }
-  if (!host) {
-    throw new Error('GITLAB_HOST_URL is not set');
-  }
+  const activeSessions = new Map<string, AuthDetails>();
 
   // Set various HTTP headers to make the application little more secure (https://www.npmjs.com/package/helmet).
   app.use(helmet())
@@ -66,7 +56,6 @@ try {
   // NOTE! Must be placed before any middle that needs access to the context!
   //       See https://www.npmjs.com/package/express-http-context.
   app.use(httpContext.middleware)
-
 
   // Use a morgan logger.
   app.use(morganLogger)
@@ -83,6 +72,12 @@ try {
 
     next()
   })
+
+  // Serve static files.
+  app.use(express.static(serverOptions.publicPath))
+
+  // Set up session handling.
+  app.use(session(sessionOptions))
 
   // Register routes.
   app.use('/', router)
@@ -126,8 +121,8 @@ try {
   })
 
   // Starts the HTTP server listening for connections.
-  const server = app.listen(port, () => {
-    logger.info(`Server running at http://localhost:${port}`)
+  const server = app.listen(serverOptions.port, () => {
+    logger.info(`Server running at http://localhost:${serverOptions.port}`)
     logger.info('Press Ctrl-C to terminate...')
   })
 } catch (err) {
