@@ -8,14 +8,14 @@
  */
 
 export class AuthDetails{
-  code: string | null
-  accessToken: string | null;
-  refreshToken: string | null;
+  code: string
+  accessToken: string;
+  refreshToken: string;
 
   constructor (code: string, accessToken: string, refreshToken: string) {
-    this.code = code || null
-    this.accessToken = accessToken || null
-    this.refreshToken = refreshToken || null
+    this.code = code
+    this.accessToken = accessToken
+    this.refreshToken = refreshToken
     Object.freeze(this)
   }
 }
