@@ -1,8 +1,11 @@
 /**
  * @description Server options
  */
+
 import { dirname, join } from 'path'
 import { fileURLToPath } from 'url'
+// Import the ServerOptions type.
+import { ServerOptions } from '../lib/types/serverOptions.js'
 
 if(!process.env.EXPRESS_PORT) {
   throw new Error('EXPRESS_PORT is not set');
