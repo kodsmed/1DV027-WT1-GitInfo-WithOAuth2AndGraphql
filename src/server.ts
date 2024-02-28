@@ -18,7 +18,7 @@ import { fileURLToPath } from 'url'
 // Package modules.
 import helmet from 'helmet';
 import cors from 'cors';
-import express, { NextFunction, Request, Response } from 'express';
+import express, { NextFunction, Request, Response, response } from 'express';
 import session from 'express-session';
 import 'dotenv/config'
 import { morganLogger } from './config/morgan.js';
@@ -31,6 +31,7 @@ import { router } from './routes/router.js'
 // Load configuration settings.
 import { sessionOptions } from './config/sessionOptions.js';
 import { serverOptions } from './config/serverOptions.js';
+import { bootstrapViewEngine } from './config/bootstrapViewEngine.js';
 
 // Load extended types.
 import ExtendedRequest from './lib/types/req-extentions.js';
@@ -73,11 +74,17 @@ try {
     next()
   })
 
+  // Set up the view engine.
+  bootstrapViewEngine(app, response, serverOptions)
+
   // Serve static files.
   app.use(express.static(serverOptions.publicPath))
 
   // Set up session handling.
   app.use(session(sessionOptions))
+  if(process.env.NODE_ENV === 'production') {
+    app.set('trust proxy', 1) // trust first proxy if on the production environment.
+  }
 
   // Register routes.
   app.use('/', router)

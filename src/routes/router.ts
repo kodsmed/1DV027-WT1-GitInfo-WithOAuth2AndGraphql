@@ -20,7 +20,8 @@ import SessionData from '../lib/types/sessionData-extentions.js'
 export const router = express.Router()
 
 router.get('/', (req, res) => {
-  res.send('Hello World!')
+  const baseURL = "\\"
+  res.render('home/index', {baseURL})
 })
 
 router.use('/auth', authRouter)
