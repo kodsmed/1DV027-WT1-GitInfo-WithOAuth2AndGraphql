@@ -6,75 +6,134 @@
  */
 
 import express from 'express'
+import { OAuthenticator } from '../../service/OAuthenticator.js'
+import { ActiveSessions } from '../../lib/types/ActiveSessions.js'
+import { ServerOptions } from '../../lib/types/serverOptions.js'
+import { GitlabApplicationSettings } from '../../lib/types/GitlabApplicationSettings.js'
 
-import { OAuthenticator } from './OAuthenticator.js'
+// Import the AuthDetails type
+import { AuthDetails } from '../../lib/types/AuthDetails.js'
 
-export const authRouter = express.Router()
-const app = express()
+// Import the extended express request object
+import ExtendedRequest from '../../lib/types/req-extentions.js';
 
-const port = process.env.EXPRESS_PORT || ""
-const clientId = process.env.GITLAB_CLIENT_ID || ""
-const clientSecret = process.env.GITLAB_CLIENT_SECRET || ""
-const host = process.env.GITLAB_HOST_URL || ""
+export default function createAuthRouter(
+  activeSessions: ActiveSessions,
+  oAuthenticator: OAuthenticator,
+  serverOptions: ServerOptions,
+  gitlabApplicationSettings: GitlabApplicationSettings
+): express.Router {
+  const authRouter = express.Router()
+  const app = express()
 
-// The base URL for the redirect URL, by splitting it like this we can easily add the callback path later.
-// Thus allowing us to use the same base URL for additional OAuth2.0 providers, if we want to add more in the future.
-const redirectURLBase = `http://localhost:${port}/auth/`;
-const scopes = ['read_user', 'read_api']
+  const port = serverOptions.port
+  const host = gitlabApplicationSettings.host
+  // The base URL for the redirect URL, by splitting it like this we can easily add the callback path later.
+  // Thus allowing us to use the same base URL for additional OAuth2.0 providers, if we want to add more in the future.
+  const redirectURLBase = `http://localhost:${port}/auth/`;
+  const scopes = ['read_user', 'read_api']
 
 
-authRouter.get('/gitlab', (req, res, next) => {
-// Redirect the user to the OAuth2.0 provider
-const completeRedirectURL = redirectURLBase + 'gitlab-callback';
-const authURL = `${host}/oauth/authorize?client_id=${clientId}&redirect_uri=${completeRedirectURL}&response_type=code&scope=${scopes.join('%20')}`;
-res.redirect(authURL);
-})
-
-// get gitlab-callback
-authRouter.get('/gitlab-callback?', async (req, res, next) => {
-  // Finish the authentication process and get the tokens, then redirect the user to the home page.
-  // Starting by deconstructing the code from the query string
-  const { code } = req.query
-  if (!code) {
-    next(new Error('No code provided'))
-    return
-  }
-
-  // Create a new OAuthenticator instance
-  try {
+  authRouter.get('/gitlab', (req, res, next) => {
+    // Redirect the user to the OAuth2.0 provider
     const completeRedirectURL = redirectURLBase + 'gitlab-callback';
-    const authenticator = new OAuthenticator(clientId, clientSecret, host)
-    const authDetails = await authenticator.authenticate(code as string, completeRedirectURL)
-    console.log('Authentication successful', authDetails)
-
-    // Ok, logged in... create a session and then use the activeSessions map to store the session paired with the gitlab credentials.
-    req.session.UUID = req.requestUuid;
-    app.get('activeSessions').set(req.session.UUID, authDetails)
-
-    // Redirect the user
-    res.redirect('./final')
-  } catch (error) {
-    console.error('Error exchanging code for token', error);
-    res.status(500).send('Authentication failed');
-  }
-})
-
-authRouter.get('/final', async (req, res, next) => {
-  const accessToken = app.get('activeSessions').get(req.session.UUID)?.accessToken
-  if (!accessToken) {
-    next(new Error('No access token found'))
-    return
-  }
-
-  // Get the user's details
-  const result = await fetch(`${host}/api/graphql`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${accessToken}`
-    },
-    body: JSON.stringify({query: '{ user { username } }'})
+    const authURL = `${host}/oauth/authorize?client_id=${gitlabApplicationSettings.applicationID}&redirect_uri=${completeRedirectURL}&response_type=code&scope=${scopes.join('%20')}`;
+    res.redirect(authURL);
   })
-  const data = await result.json()
-  res.send('Final page \n' + JSON.stringify(data))
-})
+
+  // get gitlab-callback
+  authRouter.get('/gitlab-callback?', async (req, res, next) => {
+    // Finish the authentication process and get the tokens, then redirect the user to the home page.
+    // Starting by deconstructing the code from the query string
+    const { code } = req.query
+    if (!code) {
+      next(new Error('No code provided'))
+      return
+    }
+
+    // Create a new OAuthenticator instance
+    try {
+      const completeRedirectURL = redirectURLBase + 'gitlab-callback';
+      const authDetails = await oAuthenticator.authenticate(code as string, completeRedirectURL) as AuthDetails
+      console.log('Authentication successful', authDetails)
+
+      // Ok, logged in... create a session and then use the activeSessions map to store the session paired with the gitlab credentials.
+      req.session.UUID = req.requestUuid;
+      console.log('req.requestUuid at callback', req.requestUuid)
+      console.log('req.session.UUID at callback', req.session.UUID)
+
+      req.session.save((err: Error) => {
+        activeSessions.set(req.session.UUID, authDetails)
+        if (err) {
+          return next(err);
+        }
+        res.redirect('/auth/final');
+      });
+    } catch (error) {
+      console.error('Error exchanging code for token', error);
+      res.status(500).send('Authentication failed');
+    }
+  })
+
+  authRouter.get('/final', async (req, res, next) => {
+    if (!req.requestUuid) {
+      // This should never happen, but if it does, we need to know about it.
+      next(new Error('UUID not found in session'))
+      return
+    }
+    console.log('req.requestUuid at final', req.requestUuid)
+    console.log('Active sessions', activeSessions)
+    console.log('Active sessions size', activeSessions.size)
+    console.log('Active sessions has UUID', activeSessions.has(req.requestUuid))
+    const activeSession = activeSessions.get(req.requestUuid) as AuthDetails
+    console.log('Active session', activeSession)
+    if (!activeSessions.has(req.requestUuid)) {
+      // If the user is not logged in, redirect them to the home page.
+      res.redirect('/')
+    } else {
+
+      // Get the user's details
+      const result = await fetch(`${host}/api/graphql`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${activeSessions.get(req.session.UUID)?.accessToken}`
+        },
+        body: JSON.stringify({
+          query: `
+            query {
+              currentUser {
+                id
+                name
+                emails{
+                  edges{
+                    node{email}
+                  }
+                }
+              }
+            }
+          `
+        })
+      })
+      const data = await result.json()
+      res.send('Final page \n' + JSON.stringify(data))
+    }
+  })
+
+  authRouter.get('/cookie-set', (req, res) => {
+    req.session.UUID = req.requestUuid;
+    console.log('req.requestUuid at cookie-set', req.requestUuid)
+    res.send('Cookie set');
+  })
+
+  authRouter.get('/cookie-get', (req, res) => {
+    // Replace 'cookieName' with the actual name of the cookie you want to retrieve
+    if (req.session.UUID) {
+      res.send('UUID \n' + req.session.UUID);
+    } else {
+      res.send('Please login to view your dashboard');
+    }
+  })
+
+  return authRouter
+}

@@ -26,7 +26,8 @@ import { morganLogger } from './config/morgan.js';
 // Application modules.
 import { limiter } from './config/rateLimiter.js'
 import { logger } from './config/winston.js'
-import { router } from './routes/router.js'
+import { createMainRouter } from './service/routerFactory.js';
+import { OAuthenticator } from './service/OAuthenticator.js';
 
 // Load configuration settings.
 import { sessionOptions } from './config/sessionOptions.js';
@@ -37,21 +38,21 @@ import { bootstrapViewEngine } from './config/bootstrapViewEngine.js';
 import ExtendedRequest from './lib/types/req-extentions.js';
 import { ExtendedError } from './lib/types/ExtendedError.js';
 import { AuthDetails } from './lib/types/AuthDetails.js';
+import { ActiveSessions } from './lib/types/ActiveSessions.js';
+import { gitlabApplicationSettings } from './config/gitlabApplicationSettings.js';
 
 // Set up
 try {
   const app = express();
-  const port = process.env.EXPRESS_PORT;
 
   // Tie a map of active sessions paired with gitlab credentials to the server instance so that we can access it from the routes.
-  const activeSessions = new Map<string, AuthDetails>();
-  app.set('activeSessions', activeSessions);
+  const activeSessions = new Map<string, AuthDetails>() as ActiveSessions;
 
   // Set various HTTP headers to make the application little more secure (https://www.npmjs.com/package/helmet).
-  app.use(helmet())
+  // app.use(helmet())
 
   // Enable Cross Origin Resource Sharing (CORS) (https://www.npmjs.com/package/cors).
-  app.use(cors())
+  // app.use(cors())
 
   // Parse requests of the content type application/json.
   app.use(express.json())
@@ -67,12 +68,34 @@ try {
   // Apply the rate limiting middleware to all requests.
   app.use(limiter)
 
+  // Set up session handling.
+  app.use(session(sessionOptions))
+  if (process.env.NODE_ENV === 'production') {
+    app.set('trust proxy', 1) // trust first proxy if on the production environment.
+  }
+
+  app.use((req, res, next) => {
+    console.log('Cookies:', req.cookies); // If you are using 'cookie-parser' middleware
+    console.log('Session:', req.session);
+    next();
+  });
+
   // Middleware to be executed before the routes.
   app.use((req: Request, res: Response, next: NextFunction) => {
-    // Add a request UUID to each request and store information about
-    // each request in the request-scoped context.
-    req.requestUuid = randomUUID()
-    httpContext.set('request', req)
+    // Check if there is a session cookie and if there is re-acquire the UUID from the session.
+    // WARNING: Removing the optional chaining operator ?. will cause the server to crash if the session is not found.
+    if (req.session?.UUID) {
+      console.log('fsadfa')
+      console.log('Session found', req.session)
+      console.log('Session UUID', req.session.UUID)
+      console.log('req.requestUuid', req.requestUuid)
+      req.requestUuid = req.session.UUID
+      console.log('req.requestUuid after session', req.requestUuid)
+    } else {
+      // Add a new request UUID to each request
+      console.log('No session found')
+      req.requestUuid = randomUUID()
+    }
 
     next()
   })
@@ -83,14 +106,10 @@ try {
   // Serve static files.
   app.use(express.static(serverOptions.publicPath))
 
-  // Set up session handling.
-  app.use(session(sessionOptions))
-  if(process.env.NODE_ENV === 'production') {
-    app.set('trust proxy', 1) // trust first proxy if on the production environment.
-  }
 
   // Register routes.
-  app.use('/', router)
+  const mainRouter = createMainRouter(activeSessions, new OAuthenticator(gitlabApplicationSettings), serverOptions, gitlabApplicationSettings)
+  app.use('/', mainRouter)
 
   // Error handler.
   app.use((err: ExtendedError, req: Request, res: Response, next: NextFunction) => {
