@@ -7,12 +7,11 @@
  */
 
 import express, { NextFunction } from "express"
-import { AuthDetails } from "../../lib/types/AuthDetails.js"
+import { AuthDetails } from "../lib/types/AuthDetails.js"
+import { GitlabApplicationSettings } from "../lib/types/GitlabApplicationSettings.js"
 
 export class OAuthenticator {
-  private clientId: string
-  private clientSecret: string
-  private host: string
+  private gitlabApplicationSettings: GitlabApplicationSettings
 
   /**
    * Creates an instance of the OAuthenticator class.
@@ -21,30 +20,8 @@ export class OAuthenticator {
    * @param {string} clientSecret - The client secret of the application.
    * @param {string} host - The host of the OAuth2.0 provider.
    */
-  constructor(clientId: string, clientSecret: string, host: string) {
-    if (!clientId || !clientSecret || !host) {
-      throw new Error('clientId, clientSecret and host must be provided')
-    }
-
-    if (!this.canCreateURL(host)) {
-      throw new Error('host is not a valid URL')
-    }
-
-    this.clientId = clientId
-    this.clientSecret = clientSecret
-    this.host = host
-  }
-
-  /**
-   * Check if an URL can be created from the given path.
-   */
-  private canCreateURL(path: string): boolean {
-    try {
-      new URL(path)
-      return true
-    } catch (error) {
-      return false
-    }
+  constructor(gitlabApplicationSettings: GitlabApplicationSettings) {
+    this.gitlabApplicationSettings = gitlabApplicationSettings
   }
 
   /**
@@ -57,14 +34,14 @@ export class OAuthenticator {
   async authenticate(code: string, redirectURL: string): Promise<AuthDetails> {
 
 
-    const tokenResponse = await fetch(`${this.host}/oauth/token`, {
+    const tokenResponse = await fetch(`${this.gitlabApplicationSettings.host}/oauth/token`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        client_id: this.clientId,
-        client_secret: this.clientSecret,
+        client_id: this.gitlabApplicationSettings.applicationID,
+        client_secret: this.gitlabApplicationSettings.applicationSecret,
         code,
         grant_type: 'authorization_code',
         redirect_uri: redirectURL,
@@ -75,15 +52,6 @@ export class OAuthenticator {
     const accessToken = tokenData.access_token;
     const refreshToken = tokenData.refresh_token;
     const expiresIn = tokenData.expires_in;
-
-    // WARNING: This is a security risk!
-    // TODO: Remove this in production!
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('tokenData:', tokenData)
-      console.log('accessToken:', accessToken)
-      console.log('refreshToken:', refreshToken)
-      console.log('expiresIn:', expiresIn)
-    }
 
     return new AuthDetails(code, accessToken, refreshToken)
   }
