@@ -10,6 +10,7 @@ import express from 'express'
 import { OAuthenticator } from './OAuthenticator.js'
 
 export const authRouter = express.Router()
+const app = express()
 
 const port = process.env.EXPRESS_PORT || ""
 const clientId = process.env.GITLAB_CLIENT_ID || ""
@@ -29,11 +30,8 @@ const authURL = `${host}/oauth/authorize?client_id=${clientId}&redirect_uri=${co
 res.redirect(authURL);
 })
 
-authRouter.get('/final', (req, res, next) => {
-  res.send('Final page')
-})
-
-authRouter.get('/gitlab-callback', async (req, res, next) => {
+// get gitlab-callback
+authRouter.get('/gitlab-callback?', async (req, res, next) => {
   // Finish the authentication process and get the tokens, then redirect the user to the home page.
   // Starting by deconstructing the code from the query string
   const { code } = req.query
@@ -44,15 +42,39 @@ authRouter.get('/gitlab-callback', async (req, res, next) => {
 
   // Create a new OAuthenticator instance
   try {
-    const completeRedirectURL = redirectURLBase + '/final';
+    const completeRedirectURL = redirectURLBase + 'gitlab-callback';
     const authenticator = new OAuthenticator(clientId, clientSecret, host)
     const authDetails = await authenticator.authenticate(code as string, completeRedirectURL)
-    // TODO: Save the tokens and pass them to the user as a session cookie
-    // TODO: Remove the console.log and send a proper response
     console.log('Authentication successful', authDetails)
+
+    // Ok, logged in... create a session and then use the activeSessions map to store the session paired with the gitlab credentials.
+    req.session.UUID = req.requestUuid;
+    app.get('activeSessions').set(req.session.UUID, authDetails)
+
+    // Redirect the user
     res.redirect('./final')
   } catch (error) {
     console.error('Error exchanging code for token', error);
     res.status(500).send('Authentication failed');
   }
+})
+
+authRouter.get('/final', async (req, res, next) => {
+  const accessToken = app.get('activeSessions').get(req.session.UUID)?.accessToken
+  if (!accessToken) {
+    next(new Error('No access token found'))
+    return
+  }
+
+  // Get the user's details
+  const result = await fetch(`${host}/api/graphql`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${accessToken}`
+    },
+    body: JSON.stringify({query: '{ user { username } }'})
+  })
+  const data = await result.json()
+  res.send('Final page \n' + JSON.stringify(data))
 })

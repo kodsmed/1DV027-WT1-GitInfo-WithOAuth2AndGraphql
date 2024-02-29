@@ -42,7 +42,10 @@ import { AuthDetails } from './lib/types/AuthDetails.js';
 try {
   const app = express();
   const port = process.env.EXPRESS_PORT;
+
+  // Tie a map of active sessions paired with gitlab credentials to the server instance so that we can access it from the routes.
   const activeSessions = new Map<string, AuthDetails>();
+  app.set('activeSessions', activeSessions);
 
   // Set various HTTP headers to make the application little more secure (https://www.npmjs.com/package/helmet).
   app.use(helmet())
