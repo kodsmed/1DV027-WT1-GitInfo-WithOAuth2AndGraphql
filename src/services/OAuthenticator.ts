@@ -53,6 +53,6 @@ export class OAuthenticator {
     const refreshToken = tokenData.refresh_token;
     const expiresIn = tokenData.expires_in;
 
-    return new AuthDetails(code, accessToken, refreshToken)
+    return new AuthDetails(code, accessToken, refreshToken, expiresIn)
   }
 }

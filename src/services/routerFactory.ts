@@ -3,6 +3,7 @@
  */
 // Import package modules.
 import express from 'express';
+import { morganLogger } from '../config/morgan.js';
 
 // Import the types
 import { ActiveSessions } from '../lib/types/ActiveSessions.js';
