@@ -11,12 +11,31 @@ export class AuthDetails{
   code: string
   accessToken: string;
   refreshToken: string;
+  expiresAt: Date;
+  createdAt: Date;
 
-  constructor (code: string, accessToken: string, refreshToken: string) {
+  constructor (code: string, accessToken: string, refreshToken: string, expiresIn: number) {
     this.code = code
     this.accessToken = accessToken
     this.refreshToken = refreshToken
-    Object.freeze(this)
+    this.expiresAt = new Date(new Date().getTime() + expiresIn * 1000)
+    this.createdAt = new Date()
+
+  }
+
+  /**
+   * Checks if the access token has expired.
+   *
+   * @returns {boolean} - True if the access token has expired, otherwise false.
+   */
+  isExpired(): boolean {
+    return this.expiresAt < new Date()
+  }
+}
+
+export class NullAuthDetails extends AuthDetails {
+  constructor() {
+    super("", "", "", 0)
   }
 }
 
