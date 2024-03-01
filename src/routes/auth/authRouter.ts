@@ -6,7 +6,7 @@
  */
 
 import express from 'express'
-import { OAuthenticator } from '../../service/OAuthenticator.js'
+import { OAuthenticator } from '../../services/OAuthenticator.js'
 import { ActiveSessions } from '../../lib/types/ActiveSessions.js'
 import { ServerOptions } from '../../lib/types/serverOptions.js'
 import { GitlabApplicationSettings } from '../../lib/types/GitlabApplicationSettings.js'
@@ -55,12 +55,9 @@ export default function createAuthRouter(
     try {
       const completeRedirectURL = redirectURLBase + 'gitlab-callback';
       const authDetails = await oAuthenticator.authenticate(code as string, completeRedirectURL) as AuthDetails
-      console.log('Authentication successful', authDetails)
 
       // Ok, logged in... create a session and then use the activeSessions map to store the session paired with the gitlab credentials.
       req.session.UUID = req.requestUuid;
-      console.log('req.requestUuid at callback', req.requestUuid)
-      console.log('req.session.UUID at callback', req.session.UUID)
 
       req.session.save((err: Error) => {
         activeSessions.set(req.session.UUID, authDetails)
@@ -81,12 +78,7 @@ export default function createAuthRouter(
       next(new Error('UUID not found in session'))
       return
     }
-    console.log('req.requestUuid at final', req.requestUuid)
-    console.log('Active sessions', activeSessions)
-    console.log('Active sessions size', activeSessions.size)
-    console.log('Active sessions has UUID', activeSessions.has(req.requestUuid))
     const activeSession = activeSessions.get(req.requestUuid) as AuthDetails
-    console.log('Active session', activeSession)
     if (!activeSessions.has(req.requestUuid)) {
       // If the user is not logged in, redirect them to the home page.
       res.redirect('/')
@@ -122,7 +114,6 @@ export default function createAuthRouter(
 
   authRouter.get('/cookie-set', (req, res) => {
     req.session.UUID = req.requestUuid;
-    console.log('req.requestUuid at cookie-set', req.requestUuid)
     res.send('Cookie set');
   })
 
