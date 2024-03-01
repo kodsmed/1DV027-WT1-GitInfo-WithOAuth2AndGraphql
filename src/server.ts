@@ -24,10 +24,11 @@ import 'dotenv/config'
 import { morganLogger } from './config/morgan.js';
 
 // Application modules.
+import { container, TYPES } from './config/inversify.config.js'
 import { limiter } from './config/rateLimiter.js'
 import { logger } from './config/winston.js'
-import { createMainRouter } from './service/routerFactory.js';
-import { OAuthenticator } from './service/OAuthenticator.js';
+import { createMainRouter } from './services/routerFactory.js';
+import { OAuthenticator } from './services/OAuthenticator.js';
 
 // Load configuration settings.
 import { sessionOptions } from './config/sessionOptions.js';
@@ -45,10 +46,12 @@ import { gitlabApplicationSettings } from './config/gitlabApplicationSettings.js
 try {
   const app = express();
 
-  // Tie a map of active sessions paired with gitlab credentials to the application.
-  // TODO: SINGLETON: This should be a singleton in the IoC container.
-  const activeSessions = new Map<string, AuthDetails>() as ActiveSessions;
-  app.set('activeSessions', activeSessions);
+  // Setup the IoC container that keeps track of the active sessions.
+  // new IoC container is created in the inversify.config.js file, if needed.
+  if (!app.get('IoC')) {
+  const IoC = container
+  app.set('IoC', IoC)
+  }
 
   // Set various HTTP headers to make the application little more secure (https://www.npmjs.com/package/helmet).
   // app.use(helmet())
@@ -77,8 +80,6 @@ try {
   }
 
   app.use((req, res, next) => {
-    console.log('Cookies:', req.cookies); // If you are using 'cookie-parser' middleware
-    console.log('Session:', req.session);
     next();
   });
 
@@ -87,15 +88,9 @@ try {
     // Check if there is a session cookie and if there is re-acquire the UUID from the session.
     // WARNING: Removing the optional chaining operator ?. will cause the server to crash if the session is not found.
     if (req.session?.UUID) {
-      console.log('fsadfa')
-      console.log('Session found', req.session)
-      console.log('Session UUID', req.session.UUID)
-      console.log('req.requestUuid', req.requestUuid)
       req.requestUuid = req.session.UUID
-      console.log('req.requestUuid after session', req.requestUuid)
     } else {
       // Add a new request UUID to each request
-      console.log('No session found')
       req.requestUuid = randomUUID()
     }
 
@@ -110,7 +105,12 @@ try {
 
 
   // Register routes.
-  const mainRouter = createMainRouter(activeSessions, new OAuthenticator(gitlabApplicationSettings), serverOptions, gitlabApplicationSettings)
+  const mainRouter = createMainRouter(
+    app.get("IoC").get(TYPES.GitlabSessionController).getAllSessions(),
+    new OAuthenticator(gitlabApplicationSettings),
+    serverOptions,
+    gitlabApplicationSettings
+  )
   app.use('/', mainRouter)
 
   // Error handler.
