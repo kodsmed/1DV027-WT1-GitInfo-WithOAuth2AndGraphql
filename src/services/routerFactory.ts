@@ -3,7 +3,6 @@
  */
 // Import package modules.
 import express from 'express';
-import { morganLogger } from '../config/morgan.js';
 
 // Import the types
 import { ActiveSessions } from '../lib/types/ActiveSessions.js';
@@ -23,6 +22,6 @@ export function createMainRouter(
   gitlabApplicationSettings: GitlabApplicationSettings
 ): express.Router {
   const authRouter = createAuthRouter(activeSessions, oAuthenticator, serverOptions, gitlabApplicationSettings);
-  const mainRouter = createRouter(authRouter);
+  const mainRouter = createRouter(authRouter, activeSessions, serverOptions, gitlabApplicationSettings);
   return mainRouter;
 }
