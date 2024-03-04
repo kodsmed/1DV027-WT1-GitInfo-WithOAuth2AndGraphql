@@ -4,8 +4,9 @@
  * @property {string} code - The current request's session ID towards gitlab, if available.
  * @property {string} token - The current request's token towards gitlab, if available.
  * @property {string} refreshToken - The current request's refresh token towards gitlab, if available.
- * @module ExtendedRequest
+ * @class ExtendedRequest
  */
+import { request } from 'express';
 import 'express-serve-static-core';
 
 declare module 'express-serve-static-core' {
@@ -14,6 +15,28 @@ declare module 'express-serve-static-core' {
     code?: string
     token?: string
     refreshToken?: string
-    session: any
+    session?: any
+    code?: string
+    UUID?: string
+    query?: any
+    navLinks?: { href: string, text: string }[]
   }
 }
+
+export class ExtendedRequest extends 'request' {
+  requestUuid?: string
+  code?: string
+  token?: string
+  refreshToken?: string
+  session?: any
+  code?: string
+  UUID?: string
+  query?: any
+  navLinks?: { href: string, text: string }[]
+
+  constructor() {
+    super()
+  }
+}
+
+
