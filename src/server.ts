@@ -35,11 +35,14 @@ import { sessionOptions } from './config/sessionOptions.js';
 import { serverOptions } from './config/serverOptions.js';
 import { bootstrapViewEngine } from './config/bootstrapViewEngine.js';
 
+// Import middleware.
+import { authenticateSessionAndSetLinks } from './routes/middleware/authenticateSessionAndSetLinks.js';
+import { removeExpiredSessions } from './routes/middleware/removeExpiredSessions.js';
+import { refreshCurrentTokenIfNeeded } from './routes/middleware/refreshCurrentTokenIfNeeded.js';
+
 // Load extended types.
-import ExtendedRequest from './lib/types/req-extentions.js';
+import { ExtendedRequest } from './lib/types/req-extentions.js';
 import { ExtendedError } from './lib/types/ExtendedError.js';
-import { AuthDetails } from './lib/types/AuthDetails.js';
-import { ActiveSessions } from './lib/types/ActiveSessions.js';
 import { gitlabApplicationSettings } from './config/gitlabApplicationSettings.js';
 
 // Set up
@@ -103,6 +106,18 @@ try {
   // Serve static files.
   app.use(express.static(serverOptions.publicPath))
 
+  // Apply custom middleware.
+  app.use((req, res, next) => authenticateSessionAndSetLinks(
+    req, res, next,
+    app.get("IoC").get(TYPES.GitlabSessionController).getAllSessions(),
+    serverOptions.baseURL
+  ))
+  app.use((req, res, next) => refreshCurrentTokenIfNeeded(
+    req, res, next,
+    app.get("IoC").get(TYPES.GitlabSessionController).getAllSessions(),
+    new OAuthenticator(gitlabApplicationSettings)
+  ))
+  app.use((req, res, next) => removeExpiredSessions(req, res, next))
 
   // Register routes.
   const mainRouter = createMainRouter(

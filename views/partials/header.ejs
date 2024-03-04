@@ -1,6 +1,6 @@
 <header>
   <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-    <a class="navbar-brand" href="#">Just In time!*</a>
+    <a class="navbar-brand" href="#">- GitInfo -</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse"
       aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -10,12 +10,12 @@
         <li class="nav-item">
           <a class="nav-link" href="./">Home</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="./issues/">List</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="./issues/create">Create an issue</a>
-        </li>
+        <!-- For each link item in the navLinks array, create a list item with a link to the href and the text of the link -->
+        <% navLinks.forEach(function(link) { %>
+          <li class="nav-item">
+            <a class="nav-link" href="<%= link.href %>"><%= link.text %></a>
+          </li>
+        <% }); %>
       </ul>
     </div>
   </nav>
