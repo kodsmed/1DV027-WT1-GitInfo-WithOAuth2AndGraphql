@@ -6,7 +6,9 @@
  * @property {string} timeOfActivity - The time when the activity was performed.
  */
 export class Activity {
+  number: number = 0;
   activity: string = '';
+  description: string = '';
   type: string = '';
   dayOfActivity: string = '';
   timeOfActivity: string = '';
@@ -14,9 +16,17 @@ export class Activity {
   /**
    * Creates an instance of Activity.
    */
-  constructor(activity: string, type: string, timeOfActivity: string) {
+  constructor(
+    number:number,
+    type: string,
+    activity: string,
+    title: string,
+    timeOfActivity: string
+  ) {
+    this.number = number;
     this.setActivity(activity);
     this.setType(type);
+    this.setTitle(title);
     this.setTime(timeOfActivity);
   }
 
@@ -45,7 +55,14 @@ export class Activity {
     this.type = type;
   }
 
-  private verify(string: string, name: string) {
+  /**
+   * Verifies the input string.
+   * @param {string} string - The string to verify.
+   * @param {string} name - The name of the string.
+   * @param {number} length - The maximum length of the string. Default is 32.
+   * @throws {Error}
+   */
+  private verify(string: string, name: string, length: number = 32) {
     if (typeof string !== 'string') {
       throw new Error(`${name} must be a string.`);
     }
@@ -54,9 +71,17 @@ export class Activity {
       throw new Error(`${name} cannot be empty.`);
     }
 
-    if (string.length > 32) {
-      throw new Error(`${name} cannot be longer than 32 characters.`);
+    if (string.length > length) {
+      throw new Error(`${name} cannot be longer than ${length} characters.`);
     }
+  }
+
+  /**
+   * Verifies and Sets the description.
+   */
+  private setTitle(description: string) {
+    this.verify(description, 'Description', 256);
+    this.description = description;
   }
 
   /**
@@ -68,10 +93,22 @@ export class Activity {
     this.verifyTime(timeOfActivity);
 
     // Split the date and time.
-    const [date, timeString] = timeOfActivity.split('T');
-    const [hours, minutes, seconds] = timeString.split(':');
-    this.dayOfActivity = `${date}`;
-    this.timeOfActivity = `${hours}:${minutes}`;
+    const dateObject = new Date(timeOfActivity)
+    const year: number = dateObject.getFullYear()
+    const month: number = dateObject.getMonth() + 1 // month is 0 indexed, so we add 1 to compensate.
+    const day: number = dateObject.getDate()
+    const hour: number = dateObject.getHours()
+    const minute: number = dateObject.getMinutes()
+
+    // convert to string
+    const monthString = month < 10 ? `0${month}` : `${month}`
+    const dayString = day < 10 ? `0${day}` : `${day}`
+    const hourString = hour < 10 ? `0${hour}` : `${hour}`
+    const minuteString = minute < 10 ? `0${minute}` : `${minute}`
+
+    // Set the date and time.
+    this.dayOfActivity = `${year}-${monthString}-${dayString}`
+    this.timeOfActivity = `${hourString}:${minuteString}`
   }
 
   private verifyTime(time: string) {
@@ -80,7 +117,7 @@ export class Activity {
     }
 
     // Must match the format of a date string. "2017-02-09T10:43:19.426Z"
-    if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/.test(time)) {
+    if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}\+\d{2}:\d{2}$/.test(time)) {
       throw new Error('Time must be a valid date string.');
     }
 
