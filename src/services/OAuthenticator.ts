@@ -55,4 +55,25 @@ export class OAuthenticator {
 
     return new AuthDetails(code, accessToken, refreshToken, expiresIn)
   }
+
+  async refresh(code: string, refreshToken: string): Promise<AuthDetails> {
+    const tokenResponse = await fetch(`${this.gitlabApplicationSettings.host}/oauth/token`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        client_id: this.gitlabApplicationSettings.applicationID,
+        client_secret: this.gitlabApplicationSettings.applicationSecret,
+        refresh_token: refreshToken,
+        grant_type: 'refresh_token',
+      })
+    });
+
+    const tokenData = await tokenResponse.json();
+    const accessToken = tokenData.access_token;
+    const expiresIn = tokenData.expires_in;
+
+    return new AuthDetails(code, accessToken, refreshToken, expiresIn)
+  }
 }
