@@ -35,3 +35,7 @@ As you implement tasks and add functionality, it is important to create and clos
 * 13 As an end user, I want to be able to list at most three groups, and at most, five projects, including subgroups, of a specific group, along with the date and author of the most recent commit for each project.
 
 * 14 As a developer, I want to organize the code, making it easier to develop, test and maintain. OPTIONAL.
+
+## Assignment Report
+
+The front end is a very minimum. I would very much liked to have a more polished front end, with for example loading indicators. But I have focused on the backend since that is the main focus of the assignment.
