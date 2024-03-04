@@ -40,6 +40,7 @@ decorate(inject(TYPES.GitlabSessionRepository), GitlabSessionService, 0)
 decorate(inject(TYPES.GitlabSessionService), GitlabSessionController, 0)
 decorate(inject(TYPES.GitlabSessionService), UserController, 0)
 decorate(inject(TYPES.GitlabSessionService), ActivityController, 0)
+decorate(inject(TYPES.GitlabSessionService), GroupController, 0)
 
 // Create the IoC container.
 export const container = new Container()
@@ -51,4 +52,4 @@ container.bind(TYPES.GitlabSessionService).to(GitlabSessionService).inSingletonS
 container.bind(TYPES.GitlabSessionController).to(GitlabSessionController).inSingletonScope()
 container.bind(TYPES.UserController).to(UserController).inSingletonScope()
 container.bind(TYPES.ActivityController).to(ActivityController).inSingletonScope()
-
+container.bind(TYPES.GroupController).to(GroupController).inSingletonScope()
