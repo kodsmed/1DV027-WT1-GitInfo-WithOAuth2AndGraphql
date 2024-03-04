@@ -7,10 +7,11 @@ import { GitlabSessionRepository } from '../repositories/GitlabSessionRepository
 import { GitlabSessionService } from '../services/GitlabSessionService.js'
 import { GitlabSessionController } from '../controller/GitlabSessionController.js'
 import { UserController } from '../controller/UserController.js'
-import { GitlabSessionModelPlaceholder } from '../models/GitlabSessionModel.js'
+import { ActivityController } from '../controller/ActivityController.js'
 
 // Import types
 import { AuthDetails } from '../lib/types/AuthDetails.js'
+import { GitlabSessionModelPlaceholder } from '../models/GitlabSessionModel.js'
 
 // Define the types to be used by the IoC container.
 export const TYPES = {
@@ -18,7 +19,8 @@ export const TYPES = {
   GitlabSessionRepository: Symbol.for('GitlabSessionRepository'),
   GitlabSessionService: Symbol.for('GitlabSessionService'),
   GitlabSessionController: Symbol.for('GitlabSessionController'),
-  UserController: Symbol.for('UserController')
+  UserController: Symbol.for('UserController'),
+  ActivityController: Symbol.for('ActivityController')
 }
 
 // Declare the injectable and its dependencies.
@@ -27,6 +29,7 @@ decorate(injectable(), GitlabSessionRepository)
 decorate(injectable(), GitlabSessionService)
 decorate(injectable(), GitlabSessionController)
 decorate(injectable(), UserController)
+decorate(injectable(), ActivityController)
 
 // Feed the dependencies to the injectable.
 // NOTE: The repository currently has no dependencies, but IF for some reason we want to swap the Map for a database, it is now prepared for it.
@@ -34,6 +37,7 @@ decorate(inject(TYPES.GitlabSessionModel), GitlabSessionRepository, 0)
 decorate(inject(TYPES.GitlabSessionRepository), GitlabSessionService, 0)
 decorate(inject(TYPES.GitlabSessionService), GitlabSessionController, 0)
 decorate(inject(TYPES.GitlabSessionService), UserController, 0)
+decorate(inject(TYPES.GitlabSessionService), ActivityController, 0)
 
 // Create the IoC container.
 export const container = new Container()
@@ -44,4 +48,5 @@ container.bind(TYPES.GitlabSessionRepository).to(GitlabSessionRepository).inSing
 container.bind(TYPES.GitlabSessionService).to(GitlabSessionService).inSingletonScope()
 container.bind(TYPES.GitlabSessionController).to(GitlabSessionController).inSingletonScope()
 container.bind(TYPES.UserController).to(UserController).inSingletonScope()
+container.bind(TYPES.ActivityController).to(ActivityController).inSingletonScope()
 
