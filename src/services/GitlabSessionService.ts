@@ -18,7 +18,9 @@ export class GitlabSessionService {
    *
    * @param {GitlabSessionRepository} gitlabSessionRepository - The Gitlab session repository.
    */
-  constructor(gitlabSessionRepository: GitlabSessionRepository) {
+  constructor(
+    gitlabSessionRepository: GitlabSessionRepository,
+  ) {
     this.gitlabSessionRepository = gitlabSessionRepository
   }
 
@@ -68,7 +70,7 @@ export class GitlabSessionService {
    */
   deleteSession(sessionId: string): void {
     this.validateSessionId(sessionId)
-    if (!this.hasSession(sessionId)){
+    if (!this.hasSession(sessionId)) {
       throw new Error('Session does not exist')
     }
     this.gitlabSessionRepository.deleteSession(sessionId)
@@ -102,7 +104,7 @@ export class GitlabSessionService {
    */
   updateSession(sessionId: string, authDetails: AuthDetails): void {
     this.validateSessionId(sessionId)
-    if (!this.hasSession(sessionId)){
+    if (!this.hasSession(sessionId)) {
       throw new Error('Session does not exist')
     }
     this.gitlabSessionRepository.deleteSession(sessionId)
@@ -119,5 +121,20 @@ export class GitlabSessionService {
         this.gitlabSessionRepository.deleteSession(sessionId)
       }
     })
+  }
+
+  /**
+   * Refreshes a session.
+   *
+   * @param {string} sessionId - The session id.
+   * @param {AuthDetails} authDetails - The authentication details.
+   */
+  refreshSession(sessionId: string, authDetails: AuthDetails): void {
+    this.validateSessionId(sessionId)
+    if (!this.hasSession(sessionId)) {
+      throw new Error('Session does not exist')
+    }
+    this.gitlabSessionRepository.deleteSession(sessionId)
+    this.gitlabSessionRepository.addSession(sessionId, authDetails)
   }
 }
