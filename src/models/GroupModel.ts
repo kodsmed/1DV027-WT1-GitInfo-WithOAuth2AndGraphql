@@ -11,6 +11,8 @@ export class Group {
   description: string = '';
   subgroups: Group[] = [];
   projects: Project[] = [];
+  webUrl: string = '';
+  hasMoreProjects: boolean = false;
 
   /**
    * Creates an instance of Group.
@@ -55,8 +57,8 @@ export class Group {
       throw new Error(`${name} cannot be empty.`);
     }
 
-    if (string.length > 32) {
-      throw new Error(`${name} cannot be longer than 32 characters.`);
+    if (string.length > 256) {
+      throw new Error(`${name} cannot be longer than 256 characters.`);
     }
   }
 

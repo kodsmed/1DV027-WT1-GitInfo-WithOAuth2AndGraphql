@@ -1,16 +1,17 @@
 /**
  * Project Model
- * The project model is a simple model, containing a
+ * The project model is a simple DTO class to hold the project data.
  */
 export class Project {
-  name: string = '';
-  description: string = '';
-  webURL: string = '';
-  lastCommitOnDateString: string = '';
-  lastCommitOnTimeString: string = '';
-  lastCommitAuthor: string = '';
-  lastCommitAuthorAvatarURL: string = '';
-  lastCommitMessage: string = '';
+  name: string = ''
+  description: string = ''
+  webURL: string = ''
+  fullPath: string = ''
+  lastCommitOnDateString: string = ''
+  lastCommitOnTimeString: string = ''
+  lastCommitAuthor: string = ''
+  lastCommitAuthorAvatarURL: string = ''
+  projectAvatarURL: string = ''
 
   /**
    * Creates an instance of Project.
@@ -19,14 +20,12 @@ export class Project {
     name: string,
     description: string,
     webURL: string,
-    lastCommitOnDateString: string,
-    lastCommitOnTimeString: string,
-    lastCommitAuthor: string,
-    lastCommitAuthorAvatarURL: string,
-    lastCommitMessage: string
+    fullPath: string,
   ) {
-    this.setName(name);
-    this.setDescription(description);
+    this.setName(name)
+    this.setDescription(description)
+    this.webURL = webURL
+    this.fullPath = fullPath
   }
   /**
    * Verifies and Sets the name.
@@ -59,8 +58,8 @@ export class Project {
     if (string.length === 0) {
       throw new Error(`${name} cannot be empty.`);
     }
-    if (string.length > 32) {
-      throw new Error(`${name} cannot be longer than 32 characters.`);
+    if (string.length > 256) {
+      throw new Error(`${name} cannot be longer than 256 characters.`);
     }
   }
 }
