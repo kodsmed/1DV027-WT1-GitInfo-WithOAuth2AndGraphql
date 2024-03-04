@@ -1,0 +1,46 @@
+<div class="jumbotron">
+  <div class="container">
+    <h1 class="display-3">
+      - GitLab Info -
+    </h1>
+    <p>
+      This is an demonstration of using OAuth 2.0 with GitLab as the provider.
+    </p>
+    <hr />
+  </div>
+</div>
+<div class="container">
+  <div class="row">
+    <div class="col">
+      <h2>
+        Welcome
+      </h2>
+      <p>This is your gitlab activities</p>
+
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>&nbsp;#&nbsp;</th>
+              <th>Type</th>
+              <th>Activity</th>
+              <th>Timestamp</th>
+              <th>Message?</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% activities.forEach(function(activity) { %>
+              <tr>
+                <td><%= activity.number %></td>
+                <td><%= activity.type %></td>
+                <td><%= activity.activity %></td>
+                <td><%= activity.dayOfActivity + '\n' + activity.timeOfActivity %></td>
+                <td><%= activity.description %></td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+    </div>
+  </div>
+  <hr />
+</div>
