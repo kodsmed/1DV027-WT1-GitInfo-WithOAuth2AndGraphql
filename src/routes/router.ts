@@ -10,6 +10,7 @@ import express, { NextFunction } from 'express'
 // Import the Modules
 import { container, TYPES } from '../config/inversify.config.js'
 import { UserController } from '../controller/UserController.js'
+import { ActivityController } from '../controller/ActivityController.js'
 import { GitlabSessionController } from '../controller/GitlabSessionController.js'
 
 // Import types
@@ -17,6 +18,7 @@ import { ExtendedRequest } from '../lib/types/req-extentions.js'
 import { ActiveSessions } from '../lib/types/ActiveSessions.js'
 import { GitlabApplicationSettings } from '../lib/types/GitlabApplicationSettings.js'
 import { ServerOptions } from '../lib/types/serverOptions.js'
+
 
 export function createRouter(
   authRouter: express.Router,
@@ -29,7 +31,7 @@ export function createRouter(
    */
   const router = express.Router()
   const controller = container.get<UserController>(TYPES.UserController)
-  const sessionController = container.get<GitlabSessionController>(TYPES.GitlabSessionController)
+  const activityController = container.get<ActivityController>(TYPES.ActivityController)
 
   /**
    * The home route for authenticated users... non-authenticated users will be redirected to the default route by the auth middleware.
@@ -45,6 +47,15 @@ export function createRouter(
    * @NOTE Side effect: Sets session on successful authentication.
    */
   router.use('/auth', authRouter)
+
+  /**
+   * The Activities route.
+   */
+  router.route('/activities').get((req: ExtendedRequest, res: express.Response, next: express.NextFunction) => {
+    const baseURL = serverOptions.baseURL
+    const limit = 101
+    activityController.fetchAndRenderActivities(req, res, next, limit)
+  })
 
   /**
    * Pass everything else to the error handler.
