@@ -1,0 +1,32 @@
+<div class="jumbotron">
+  <div class="container">
+    <h1 class="display-3">
+      - GitLab Info -
+    </h1>
+    <p>
+      This is an demonstration of using OAuth 2.0 with GitLab as the provider.
+    </p>
+    <hr />
+  </div>
+</div>
+<div class="container">
+  <div class="row">
+    <div class="col">
+      <h2>
+        Welcome
+      </h2>
+      <p>This is your gitlab user-details</p>
+
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">User Details</h5>
+          <p class="card-text">ID: <%- userData.gitLabID %></p>
+          <p class="card-text">Name: <%- userData.name %></p>
+          <p class="card-text">Username: <%- userData.username %></p>
+          <p class="card-text">Email: <%- userData.email %></p>
+          <p class="card-text">Avatar: <img src="<%= userData.avatarURL %>" alt="avatar" height="80px" width="80px"/></p>
+          <p class="card-text">Last Activity: <%- userData.lastActivityYYYYMMDD %></p>
+    </div>
+  </div>
+  <hr />
+</div>
