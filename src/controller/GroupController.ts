@@ -25,41 +25,53 @@ export class GroupController {
       },
       body: JSON.stringify({
         query: `
-      {
-        currentUser {
-          groups {
-            edges {
-              node {
-                name,
-                description,
-                avatarUrl,
-                webUrl,
-                fullPath,
-                projects {
-                  edges {
-                    node {
-                      id,
-                      name,
-                      description,
-                      avatarUrl,
-                      lastActivityAt,
-                      webUrl,
-                    }
+        {
+          currentUser {
+            groups(first: 3, permissionScope: CREATE_PROJECTS) {
+              edges {
+                node {
+                  name
+                  description
+                  avatarUrl
+                  webUrl
+                  fullPath
+                  projects(includeSubgroups: true, first: 5) {
+                    edges {
+                      node {
+                        name
+                        description
+                        avatarUrl
+                        lastActivityAt
+                        fullPath
+                        webUrl
+                        repository {
+                          tree {
+                            lastCommit {
+                              committedDate
+                              committerName
+                              authorGravatar
+                              descriptionHtml
+                            }
+                          }
+                        }
+                      }
+                    },
+                    pageInfo{hasNextPage}
                   }
                 }
-              }
+              }, pageInfo{hasNextPage}
             }
           }
         }
-      }
       `
       })
     })
     const data = await result.json()
-    const groups = data.data.currentUser.groups.edges
-    console.log(groups)
+    const groupsData = data.data
+    console.log(groupsData)
     const parser = new GraphQlGroupQueryParser()
-    const parsedGroups = parser.parse(groups) as GroupQueryResult
+    const parsedGroups = parser.parse(groupsData) as GroupQueryResult
+    console.log(parsedGroups)
     res.send('Final page \n' + parsedGroups)
   }
 }
