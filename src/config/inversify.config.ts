@@ -8,9 +8,9 @@ import { GitlabSessionService } from '../services/GitlabSessionService.js'
 import { GitlabSessionController } from '../controller/GitlabSessionController.js'
 import { UserController } from '../controller/UserController.js'
 import { ActivityController } from '../controller/ActivityController.js'
+import { GroupController } from '../controller/GroupController.js'
 
 // Import types
-import { AuthDetails } from '../lib/types/AuthDetails.js'
 import { GitlabSessionModelPlaceholder } from '../models/GitlabSessionModel.js'
 
 // Define the types to be used by the IoC container.
@@ -20,7 +20,8 @@ export const TYPES = {
   GitlabSessionService: Symbol.for('GitlabSessionService'),
   GitlabSessionController: Symbol.for('GitlabSessionController'),
   UserController: Symbol.for('UserController'),
-  ActivityController: Symbol.for('ActivityController')
+  ActivityController: Symbol.for('ActivityController'),
+  GroupController: Symbol.for('GroupController')
 }
 
 // Declare the injectable and its dependencies.
@@ -30,6 +31,7 @@ decorate(injectable(), GitlabSessionService)
 decorate(injectable(), GitlabSessionController)
 decorate(injectable(), UserController)
 decorate(injectable(), ActivityController)
+decorate(injectable(), GroupController)
 
 // Feed the dependencies to the injectable.
 // NOTE: The repository currently has no dependencies, but IF for some reason we want to swap the Map for a database, it is now prepared for it.
