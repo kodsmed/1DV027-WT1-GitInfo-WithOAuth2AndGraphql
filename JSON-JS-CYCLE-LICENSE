@@ -1,3 +1,10 @@
+# JSON-JS-CYCLE LICENSE
+
+This license is for the JSON-JS-CYCLE project ONLY.
+I have converted the project from JavaScript to TypeScript,
+hence used a "substantial portion" of the original code.
+Consequently, I have included the original license as per its terms.
+
 The MIT License (MIT)
 
 Copyright (c) 2023 Mats Loock
