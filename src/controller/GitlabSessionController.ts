@@ -10,8 +10,6 @@ import express, { request, response, NextFunction, Response, Request } from 'exp
 
 // Import modules
 import { GitlabSessionService } from '../services/GitlabSessionService.js'
-import { GitlabApplicationSettings } from '../lib/types/GitlabApplicationSettings.js'
-import { GitlabSessionRepository } from '../repositories/GitlabSessionRepository.js'
 
 // Import types
 import { AuthDetails, NullAuthDetails } from '../lib/types/AuthDetails.js'
@@ -19,7 +17,7 @@ import { OAuthenticator } from '../services/OAuthenticator.js'
 import { ActiveSessions } from '../lib/types/ActiveSessions.js'
 
 // Import the extended express request object
-import { ExtendedRequest } from '../lib/types/req-extentions.js';
+import { ExtendedRequest } from '../lib/types/req-extentions.js'
 
 /**
  * The Gitlab session controller.
@@ -57,7 +55,7 @@ export class GitlabSessionController {
 
     // Create a new OAuthenticator instance
     try {
-      const completeRedirectURL = redirectURLBase + 'gitlab-callback';
+      const completeRedirectURL = redirectURLBase + 'gitlab-callback'
       const authDetails = await oAuthenticator.authenticate(code as string, completeRedirectURL) as AuthDetails
 
       // Ok, logged in... create a session and then use the activeSessions map to store the session paired with the gitlab credentials.
@@ -66,12 +64,12 @@ export class GitlabSessionController {
       req.session.save((err: Error) => {
         activeSessions.set(req.session.UUID, authDetails)
         if (err) {
-          return next(err);
+          return next(err)
         }
-        res.redirect('/');
-      });
+        res.redirect('/')
+      })
     } catch (error) {
-      console.error('Error exchanging code for token', error);
+      console.error('Error exchanging code for token', error)
       res.status(401).redirect('/');
     }
   }
