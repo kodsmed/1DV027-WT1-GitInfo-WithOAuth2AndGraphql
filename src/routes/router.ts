@@ -36,6 +36,17 @@ export function createRouter(
   const groupController = container.get<GroupController>(TYPES.GroupController)
 
   /**
+   * If BASE_URL is set to something other than /, we need to remove the base URL from the request URL. This is because the router will not match the URL if it contains the base URL.
+   */
+  if (baseURL !== '/') {
+    router.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
+      req.url = req.url.replace(baseURL, '/')
+      next()
+    })
+  }
+
+
+  /**
    * The home route for authenticated users... non-authenticated users will be redirected to the default route by the auth middleware.
    */
   router.route('/').get((req: ExtendedRequest, res: express.Response, next: express.NextFunction) => {
