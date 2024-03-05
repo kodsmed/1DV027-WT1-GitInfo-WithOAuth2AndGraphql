@@ -63,8 +63,7 @@ export function createRouter(
    * It does not get its own router because it is a flat route.
    */
   router.route('/groups').get((req: ExtendedRequest, res: express.Response, next: express.NextFunction) => {
-    //groupController.fetchAndRenderGroupData(req, res, next, activeSessions, gitlabApplicationSettings.host, baseURL)
-    groupController.getGroups(req, res, next, activeSessions, gitlabApplicationSettings.host)
+    groupController.fetchAndRenderGroupData(req, res, next, activeSessions, gitlabApplicationSettings.host, baseURL)
   })
 
   /**
