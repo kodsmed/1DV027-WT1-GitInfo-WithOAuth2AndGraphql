@@ -107,11 +107,11 @@ export class GitlabSessionController {
       // Destroy the session and redirect the user to the home page.
       if (req.session) {
         req.session.destroy(() => {
-          res.redirect(serverOptions.baseURL)
+          res.redirect(`.${serverOptions.baseURL}`)
         })
       }
     } catch (error) {
-      res.redirect(serverOptions.baseURL)
+      res.redirect(`.${serverOptions.baseURL}`)
     }
   }
 
