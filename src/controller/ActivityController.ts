@@ -55,7 +55,8 @@ export class ActivityController {
       } else {
         pagesThisRun = perPage;
       }
-      const result = await fetch(`${hostURL}/api/v4/users/${userId}/events?page=${page}&per_page=${pagesThisRun}`, {
+      // Fetch the activities. The it should include all activities, not just the ones the user has done, so scope=all. Remove scope=all to only get the user's activities.
+      const result = await fetch(`${hostURL}/api/v4/users/${userId}/events?page=${page}&per_page=${pagesThisRun}&scope=all`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -66,7 +67,7 @@ export class ActivityController {
       const activities = await result.json()
       if (activities.length === 0) {
         break
-      }
+      } else {
       // Gitlab API does not filter activities by user, so we have to do it here, we can do that here, but its not my problem.
       // Doing so messes up the pagination, and will not result in the hard requirement of 101 activities.
       // for (const activity of activities) {
@@ -75,6 +76,7 @@ export class ActivityController {
       //   }
       //}
       allActivities.push(...activities)
+      }
       page++
     }
 
@@ -124,13 +126,13 @@ export class ActivityController {
     next: express.NextFunction,
     limit: number) {
       let activities = [] as Activity[]
-    //try {
+    try {
       activities = await this.getActivities(req, res, next, limit) as Activity[]
       const baseURL = serverOptions.baseURL
       const navLinks = req.navLinks
       res.render('activities/activities', { baseURL, activities, navLinks })
-    //} catch (error) {
-    //  next(new Error('Failed to retrieve activities'))
-    //}
+    } catch (error) {
+       next(new Error('Failed to retrieve activities'))
+    }
   }
 }
