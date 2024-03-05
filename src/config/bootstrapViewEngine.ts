@@ -15,6 +15,4 @@ export function bootstrapViewEngine(app: Express, res:Response, serverOptions:Se
   app.use(expressLayouts)
   app.set('layout', join(serverOptions.directoryFullName, '../../', 'views', 'layouts', 'default'))
   // Pass the base URL to the views.
-  console.log(serverOptions.baseURL)
-  console.log(res.locals)
 }

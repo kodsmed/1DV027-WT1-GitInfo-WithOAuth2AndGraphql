@@ -114,6 +114,7 @@ export class UserController {
    */
   displayHomePage(req: ExtendedRequest, res: express.Response, next: express.NextFunction, baseURL: string) {
     const navLinks = req.navLinks
+    console.log('displayHomePage, baseURL:', baseURL)
     res.render('home/index', { baseURL, navLinks })
   }
 }
