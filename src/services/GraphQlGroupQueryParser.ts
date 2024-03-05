@@ -62,8 +62,8 @@ export class GraphQlGroupQueryParser {
         project.lastCommitOnDateString = date
         project.lastCommitOnTimeString = time.split('.')[0];
         project.lastCommitAuthor = this.sanitize(lastCommit.committerName) || "&nbsp;-&nbsp;"
-        project.lastCommitAuthorAvatarURL = this.sanitize(lastCommit.committerAvatarUrl) || "./public/images/default-avatar.png"
-        project.projectAvatarURL = this.sanitize(projectNode.avatarUrl) || "./public/images/default-avatar.png"
+        project.lastCommitAuthorAvatarURL = this.sanitize(lastCommit.authorGravatar) || "./images/default-avatar.png"
+        project.projectAvatarURL = this.sanitize(projectNode.avatarUrl) || "./images/default-avatar.png"
 
         // Add the Project object to the group's projects array
         group.addProject(project);
