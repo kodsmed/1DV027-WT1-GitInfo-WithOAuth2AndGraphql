@@ -97,24 +97,23 @@ export class UserController {
    * Fetches and Then Renders the user's data from the Gitlab API.
    */
   async fetchAndRenderUserData(
-    req: ExtendedRequest,
+    req: express.Request,
     res: express.Response,
     next: NextFunction,
-    activeSessions: ActiveSessions,
     hostURL: string,
-    baseURL: string
   ) {
     const userData = await this.fetchUserData(req, res, next, hostURL)
     const navLinks = req.navLinks
+    const baseURL = req.baseUrl
     res.render('home/user', { baseURL, userData, navLinks })
   }
 
   /**
    * Display the default home page.
    */
-  displayHomePage(req: ExtendedRequest, res: express.Response, next: express.NextFunction, baseURL: string) {
+  displayHomePage(req: express.Request, res: express.Response, next: express.NextFunction) {
     const navLinks = req.navLinks
-    console.log('displayHomePage, baseURL:', baseURL)
+    const baseURL = req.baseUrl
     res.render('home/index', { baseURL, navLinks })
   }
 }

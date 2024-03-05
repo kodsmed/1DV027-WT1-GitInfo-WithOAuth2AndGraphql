@@ -40,7 +40,7 @@ export class GitlabSessionController {
    * Finish the login process by exchanging the code for a token.
    */
   async login(
-    req: ExtendedRequest,
+    req: express.Request,
     res: express.Response,
     next: NextFunction,
     oAuthenticator: OAuthenticator,
@@ -53,6 +53,9 @@ export class GitlabSessionController {
       next(new Error('No code provided'))
       return
     }
+
+    // constuct the redirect URL
+    const redirectURL = req.protocol + '://' + req.get('host') + serverOptions.baseURL + '/'
 
     // Create a new OAuthenticator instance
     try {
@@ -67,11 +70,11 @@ export class GitlabSessionController {
         if (err) {
           return next(err)
         }
-        res.redirect('/')
+        res.redirect(redirectURL)
       })
     } catch (error) {
       console.error('Error exchanging code for token', error)
-      res.status(401).redirect('/');
+      res.status(401).redirect(redirectURL);
     }
   }
 
@@ -101,17 +104,19 @@ export class GitlabSessionController {
    * @param {string} sessionId - The session id.
    */
   deleteSession(req: express.Request, res: express.Response, next: express.NextFunction): void {
+    const redirectURL = req.protocol + '://' + req.get('host') + serverOptions.baseURL + '/'
     try {
       const sessionId = req.session?.UUID
       this.gitlabSessionService.deleteSession(sessionId)
       // Destroy the session and redirect the user to the home page.
       if (req.session) {
         req.session.destroy(() => {
-          res.redirect(`.${serverOptions.baseURL}`)
+          // build the redirect URL
+          res.redirect(redirectURL)
         })
       }
     } catch (error) {
-      res.redirect(`.${serverOptions.baseURL}`)
+      res.redirect(redirectURL)
     }
   }
 

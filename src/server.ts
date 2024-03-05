@@ -41,7 +41,6 @@ import { removeExpiredSessions } from './middleware/removeExpiredSessions.js';
 import { refreshCurrentTokenIfNeeded } from './middleware/refreshCurrentTokenIfNeeded.js';
 
 // Load extended types.
-import { ExtendedRequest } from './lib/types/req-extentions.js';
 import { ExtendedError } from './lib/types/ExtendedError.js';
 import { gitlabApplicationSettings } from './config/gitlabApplicationSettings.js';
 
@@ -56,6 +55,7 @@ try {
   app.set('IoC', IoC)
   }
 
+  /**
   // Set various HTTP headers to make the application little more secure (https://www.npmjs.com/package/helmet).
   app.use(helmet.contentSecurityPolicy({
     directives: {
@@ -63,21 +63,21 @@ try {
         "'self'",
         'https://gitlab.lnu.se',
         'http://localhost',
-        'https://lagerapp.se'
+        'https://cscloud8-59.lnu.se'
       ],
 
       styleSrc: [
         "'self'",
         'http://localhost',
         'https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css',
-        'https://lagerapp.se'
+        'https://cscloud8-59.lnu.se'
       ],
 
       scriptSrc: [
         "'self'",
         'http://localhost',
         'https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js',
-        'https://lagerapp.se'
+        'https://cscloud8-59.lnu.se'
       ],
 
       imgSrc: [
@@ -85,7 +85,7 @@ try {
         'http://localhost',
         'https://gitlab.lnu.se',
         'https://secure.gravatar.com',
-        'https://lagerapp.se'
+        'https://cscloud8-59.lnu.se'
       ]
     }
   }))
@@ -96,13 +96,13 @@ try {
    * @see see https://www.npmjs.com/package/cors#enabling-cors-pre-flight
    */
 
-  const allowedOrigins = ['http://localhost', 'https://gitlab.lnu.se', 'https://lagerapp.se']
-  app.use('*', cors({
-    origin: allowedOrigins,
-    credentials: true, // allow the cookies, important.
-    preflightContinue: true, // allow the preflight requests, important, see https://www.npmjs.com/package/cors#enabling-cors-pre-flight
-    optionsSuccessStatus: 204 // translate status 204 to 200. Needed for some old browsers.
-  }))
+  const allowedOrigins = ['http://localhost', 'https://gitlab.lnu.se', 'https://cscloud8-59.lnu.se']
+  // app.use('*', cors({
+  //   origin: allowedOrigins,
+  //   credentials: true, // allow the cookies, important.
+  //   preflightContinue: true, // allow the preflight requests, important, see https://www.npmjs.com/package/cors#enabling-cors-pre-flight
+  //   optionsSuccessStatus: 204 // translate status 204 to 200. Needed for some old browsers.
+  // }))
 
   // Parse requests of the content type application/json.
   app.use(express.json())
@@ -124,9 +124,6 @@ try {
     app.set('trust proxy', 1) // trust first proxy if on the production environment.
   }
 
-  app.use((req, res, next) => {
-    next();
-  });
 
   // Middleware to be executed before the routes.
   app.use((req: Request, res: Response, next: NextFunction) => {
@@ -138,7 +135,8 @@ try {
       // Add a new request UUID to each request
       req.requestUuid = randomUUID()
     }
-
+    const baseUrl = process.env.BASE_URL || ''
+    req.baseUrl = req.protocol + '://' + req.get('host') + baseUrl + '/'
     next()
   })
 
@@ -151,8 +149,7 @@ try {
   // Apply custom middleware.
   app.use((req, res, next) => authenticateSessionAndSetLinks(
     req, res, next,
-    app.get("IoC").get(TYPES.GitlabSessionController).getAllSessions(),
-    serverOptions.baseURL
+    app.get("IoC").get(TYPES.GitlabSessionController).getAllSessions()
   ))
   app.use((req, res, next) => refreshCurrentTokenIfNeeded(
     req, res, next,
@@ -174,7 +171,7 @@ try {
   app.use((err: ExtendedError, req: Request, res: Response, next: NextFunction) => {
     logger.error(err.message, { error: err })
 
-    if (process.env.NODE_ENV === 'production') {
+    if (process.env.NODE_ENV !== 'production') {
       // Ensure a valid status code is set for the error.
       // If the status code is not provided, default to 500 (Internal Server Error).
       // This prevents leakage of sensitive error details to the client.

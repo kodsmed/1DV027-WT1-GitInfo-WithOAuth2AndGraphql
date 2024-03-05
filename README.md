@@ -39,3 +39,4 @@ As you implement tasks and add functionality, it is important to create and clos
 ## Assignment Report
 
 The front end is a very minimum. I would very much liked to have a more polished front end, with for example loading indicators. But I have focused on the backend since that is the main focus of the assignment.
+

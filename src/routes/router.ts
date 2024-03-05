@@ -40,7 +40,14 @@ export function createRouter(
    */
   if (baseURL !== '/') {
     router.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
-      req.url = req.url.replace(baseURL, '/')
+      // remove the base URL from the request URL unless the request URL contains /css or /images
+      if (!req.url.includes('/css') && !req.url.includes('/images')) {
+        req.url = req.url.replace(baseURL, '')
+      }
+      // replace // with /
+      if (req.url.startsWith('//')) {
+        req.url = req.url.replace('//', '/')
+      }
       next()
     })
   }
@@ -49,8 +56,8 @@ export function createRouter(
   /**
    * The home route for authenticated users... non-authenticated users will be redirected to the default route by the auth middleware.
    */
-  router.route('/').get((req: ExtendedRequest, res: express.Response, next: express.NextFunction) => {
-    controller.fetchAndRenderUserData(req, res, next, activeSessions, gitlabApplicationSettings.host, baseURL)
+  router.route('/').get((req: express.Request, res: express.Response, next: express.NextFunction) => {
+    controller.fetchAndRenderUserData(req, res, next, gitlabApplicationSettings.host)
   })
 
   /**
@@ -64,7 +71,7 @@ export function createRouter(
    * The Activities route.
    * It does not get its own router because it is a flat route.
    */
-  router.route('/activities').get((req: ExtendedRequest, res: express.Response, next: express.NextFunction) => {
+  router.route('/activities').get((req: express.Request, res: express.Response, next: express.NextFunction) => {
     const limit = 101
     activityController.fetchAndRenderActivities(req, res, next, limit)
   })
@@ -73,8 +80,8 @@ export function createRouter(
    * The group route.
    * It does not get its own router because it is a flat route.
    */
-  router.route('/groups').get((req: ExtendedRequest, res: express.Response, next: express.NextFunction) => {
-    groupController.fetchAndRenderGroupData(req, res, next, activeSessions, gitlabApplicationSettings.host, baseURL)
+  router.route('/groups').get((req: express.Request, res: express.Response, next: express.NextFunction) => {
+    groupController.fetchAndRenderGroupData(req, res, next, activeSessions, gitlabApplicationSettings.host)
   })
 
   /**

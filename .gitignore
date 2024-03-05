@@ -196,5 +196,6 @@ $RECYCLE.BIN/
 
 # TS output folder
 compiledSrc/
+startString.txt
 
 # End of https://www.toptal.com/developers/gitignore/api/node,linux,macos,windows,visualstudiocode

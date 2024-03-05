@@ -77,9 +77,10 @@ export class GroupController {
   /**
    * Fetches the groups from the GitLab API and then renders the groups page.
    */
-  async fetchAndRenderGroupData(req: ExtendedRequest, res: express.Response, next: express.NextFunction, activeSessions: ActiveSessions, host: string, baseURL: string) {
+  async fetchAndRenderGroupData(req: express.Request, res: express.Response, next: express.NextFunction, activeSessions: ActiveSessions, host: string) {
     const queryResult = await this.getGroups(req, res,next, activeSessions, host)
     const navLinks = req.navLinks
+    const baseURL = req.baseUrl
     res.render('groups/groups', { baseURL, navLinks, groups:queryResult.groups, haveMoreGroups: queryResult.hasMoreGroups})
   }
 }

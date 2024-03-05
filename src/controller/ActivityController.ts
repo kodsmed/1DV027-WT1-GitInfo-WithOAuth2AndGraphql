@@ -11,7 +11,6 @@ import { container, TYPES } from '../config/inversify.config.js'
 import { UserData } from '../models/UserData.js'
 import { Activity } from '../models/ActivityModel.js'
 import { gitlabApplicationSettings } from '../config/gitlabApplicationSettings.js'
-import { serverOptions } from '../config/serverOptions.js'
 
 /**
  * The Activity Controller.
@@ -121,14 +120,14 @@ export class ActivityController {
    * @throws {Error} - If the activities cannot be retrieved.
    */
   async fetchAndRenderActivities(
-    req: ExtendedRequest,
+    req: express.Request,
     res: express.Response,
     next: express.NextFunction,
     limit: number) {
       let activities = [] as Activity[]
     try {
       activities = await this.getActivities(req, res, next, limit) as Activity[]
-      const baseURL = serverOptions.baseURL
+      const baseURL = req.baseUrl
       const navLinks = req.navLinks
       res.render('activities/activities', { baseURL, activities, navLinks })
     } catch (error) {

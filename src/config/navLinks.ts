@@ -1,11 +1,15 @@
+import { serverOptions } from "./serverOptions.js";
+
+const adaptiveBase = serverOptions.baseURL === '/' ? '' : serverOptions.baseURL;
+
 const nonAuthenticatedLinks = [
-  { href: './auth/gitlab', text: 'Login with Gitlab' }
+  { href: `${adaptiveBase}/auth/gitlab`, text: 'Login with Gitlab' }
 ];
 
 const authenticatedLinks = [
-  { href: './activities', text: 'Activities' },
-  { href: './groups', text: 'Groups' },
-  { href: './auth/logout', text: 'Logout' }
+  { href: `${adaptiveBase}/activities`, text: 'Activities' },
+  { href: `${adaptiveBase}/groups`, text: 'Groups' },
+  { href: `${adaptiveBase}/auth/logout`, text: 'Logout' }
 ];
 
 export const navLinks = {
