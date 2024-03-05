@@ -55,7 +55,6 @@ try {
   app.set('IoC', IoC)
   }
 
-  /**
   // Set various HTTP headers to make the application little more secure (https://www.npmjs.com/package/helmet).
   app.use(helmet.contentSecurityPolicy({
     directives: {
@@ -97,12 +96,12 @@ try {
    */
 
   const allowedOrigins = ['http://localhost', 'https://gitlab.lnu.se', 'https://cscloud8-59.lnu.se']
-  // app.use('*', cors({
-  //   origin: allowedOrigins,
-  //   credentials: true, // allow the cookies, important.
-  //   preflightContinue: true, // allow the preflight requests, important, see https://www.npmjs.com/package/cors#enabling-cors-pre-flight
-  //   optionsSuccessStatus: 204 // translate status 204 to 200. Needed for some old browsers.
-  // }))
+  app.use('*', cors({
+    origin: allowedOrigins,
+    credentials: true, // allow the cookies, important.
+    preflightContinue: true, // allow the preflight requests, important, see https://www.npmjs.com/package/cors#enabling-cors-pre-flight
+    optionsSuccessStatus: 204 // translate status 204 to 200. Needed for some old browsers.
+  }))
 
   // Parse requests of the content type application/json.
   app.use(express.json())
