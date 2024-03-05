@@ -39,7 +39,7 @@ export default function createAuthRouter(
 
     //Since we don't know where the server is running, we need to construct the redirect URL.
     // Pull the protocol, host and base URL from the request object.
-    const redirectURLBase = req.protocol + '://' + req.get('host') + serverOptions.baseURL + '/';
+    const redirectURLBase = req.protocol + '://' + req.get('host') + serverOptions.baseURL;
     const completeRedirectURL = redirectURLBase + 'gitlab-callback';
     const authURL = `${host}/oauth/authorize?client_id=${gitlabApplicationSettings.applicationID}&redirect_uri=${completeRedirectURL}&response_type=code&scope=${scopes.join('%20')}`;
     res.redirect(authURL);
@@ -49,7 +49,7 @@ export default function createAuthRouter(
   authRouter.route('/gitlab-callback?').get(async (req, res: express.Response, next: NextFunction) => {
     //Since we don't know where the server is running, we need to construct the redirect URL.
     // Pull the protocol, host and base URL from the request object.
-    const redirectURLBase = req.protocol + '://' + req.get('host') + serverOptions.baseURL + '/';
+    const redirectURLBase = req.protocol + '://' + req.get('host') + serverOptions.baseURL;
     const controller = container.get(TYPES.GitlabSessionController) as GitlabSessionController
     await controller.login(
       req, res, next,
