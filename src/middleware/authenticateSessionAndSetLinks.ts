@@ -11,7 +11,7 @@ import { navLinks } from '../config/navLinks.js'
 export const authenticateSessionAndSetLinks = (req: express.Request, res: express.Response, next: express.NextFunction, activeSessions: ActiveSessions, baseURL: string) => {
   // If the user is not logged in, redirect them to the home page.
   // Unless they are on the auth route, then we want to let them through.
-  if ((!req.session?.UUID || !activeSessions.has(req.session.UUID)) && (!req.originalUrl.startsWith('/auth'))) {
+  if ((!req.session?.UUID || !activeSessions.has(req.session.UUID)) && (!req.originalUrl.includes('/auth/'))) {
     const controller = container.get<UserController>(TYPES.UserController)
     req.navLinks = navLinks.nonAuthenticatedLinks
     controller.displayHomePage(req, res, next, baseURL)
