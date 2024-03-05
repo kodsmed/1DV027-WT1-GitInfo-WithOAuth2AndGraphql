@@ -18,6 +18,7 @@ import { ActiveSessions } from '../lib/types/ActiveSessions.js'
 
 // Import the extended express request object
 import { ExtendedRequest } from '../lib/types/req-extentions.js'
+import { serverOptions } from '../config/serverOptions.js'
 
 /**
  * The Gitlab session controller.
@@ -106,11 +107,11 @@ export class GitlabSessionController {
       // Destroy the session and redirect the user to the home page.
       if (req.session) {
         req.session.destroy(() => {
-          res.redirect('/')
+          res.redirect(serverOptions.baseURL)
         })
       }
     } catch (error) {
-      res.redirect('/')
+      res.redirect(serverOptions.baseURL)
     }
   }
 
