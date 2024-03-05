@@ -3,12 +3,12 @@
  */
 
 import express from 'express';
-import { OAuthenticator } from '../../services/OAuthenticator.js';
-import { AuthDetails } from '../../lib/types/AuthDetails.js';
-import { ActiveSessions } from '../../lib/types/ActiveSessions.js';
-import { GitlabSessionController } from '../../controller/GitlabSessionController.js'
-import { container, TYPES } from '../../config/inversify.config.js';
-import { ExtendedRequest } from '../../lib/types/req-extentions.js';
+import { OAuthenticator } from '../services/OAuthenticator.js';
+import { AuthDetails } from '../lib/types/AuthDetails.js';
+import { ActiveSessions } from '../lib/types/ActiveSessions.js';
+import { GitlabSessionController } from '../controller/GitlabSessionController.js'
+import { container, TYPES } from '../config/inversify.config.js';
+import { ExtendedRequest } from '../lib/types/req-extentions.js';
 
 export const refreshCurrentTokenIfNeeded = (req: ExtendedRequest, res: express.Response, next: express.NextFunction, activeSessions: ActiveSessions, oAuthenticator: OAuthenticator) => {
   // Extract the current session from the activeSessions map, we know there is one because the user is authenticated in the previous middleware.
