@@ -5,7 +5,7 @@
 export class Project {
   name: string = ''
   description: string = ''
-  webURL: string = ''
+  webUrl: string = ''
   fullPath: string = ''
   lastCommitOnDateString: string = ''
   lastCommitOnTimeString: string = ''
@@ -24,7 +24,7 @@ export class Project {
   ) {
     this.setName(name)
     this.setDescription(description)
-    this.webURL = webURL
+    this.webUrl = webURL
     this.fullPath = fullPath
   }
   /**
