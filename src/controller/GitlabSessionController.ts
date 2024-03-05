@@ -100,14 +100,16 @@ export class GitlabSessionController {
    * @param {string} sessionId - The session id.
    */
   deleteSession(req: express.Request, res: express.Response, next: express.NextFunction): void {
-    const sessionId = req.session?.UUID
-    this.gitlabSessionService.deleteSession(sessionId)
-    // Destroy the session and redirect the user to the home page.
-    if (req.session) {
-      req.session.destroy(() => {
-        res.redirect('/')
-      })
-    } else {
+    try {
+      const sessionId = req.session?.UUID
+      this.gitlabSessionService.deleteSession(sessionId)
+      // Destroy the session and redirect the user to the home page.
+      if (req.session) {
+        req.session.destroy(() => {
+          res.redirect('/')
+        })
+      }
+    } catch (error) {
       res.redirect('/')
     }
   }
