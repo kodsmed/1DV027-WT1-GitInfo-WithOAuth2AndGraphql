@@ -71,7 +71,8 @@ export class GitlabSessionService {
   deleteSession(sessionId: string): void {
     this.validateSessionId(sessionId)
     if (!this.hasSession(sessionId)) {
-      throw new Error('Session does not exist')
+      // If the session does not exist, we don't need to delete it.
+      return
     }
     this.gitlabSessionRepository.deleteSession(sessionId)
   }
