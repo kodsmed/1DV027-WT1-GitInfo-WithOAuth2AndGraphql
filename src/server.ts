@@ -61,7 +61,7 @@ try {
     directives: {
       defaultSrc: [
         "'self'",
-        'gitlab.lnu.se',
+        'https://gitlab.lnu.se',
         'http://localhost',
         'https://lagerapp.se'
       ],
@@ -83,6 +83,7 @@ try {
       imgSrc: [
         "'self'",
         'http://localhost',
+        'https://gitlab.lnu.se',
         'https://secure.gravatar.com',
         'https://lagerapp.se'
       ]
