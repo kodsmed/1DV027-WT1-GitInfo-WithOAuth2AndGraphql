@@ -68,10 +68,18 @@ export class GroupController {
     })
     const data = await result.json()
     const groupsData = data.data
-    console.log(groupsData)
     const parser = new GraphQlGroupQueryParser()
     const parsedGroups = parser.parse(groupsData) as GroupQueryResult
-    console.log(parsedGroups)
-    res.send('Final page \n' + parsedGroups)
+
+    return parsedGroups
+  }
+
+  /**
+   * Fetches the groups from the GitLab API and then renders the groups page.
+   */
+  async fetchAndRenderGroupData(req: ExtendedRequest, res: express.Response, next: express.NextFunction, activeSessions: ActiveSessions, host: string, baseURL: string) {
+    const queryResult = await this.getGroups(req, res,next, activeSessions, host)
+    const navLinks = req.navLinks
+    res.render('groups/groups', { baseURL, navLinks, groups:queryResult.groups, haveMoreGroups: queryResult.hasMoreGroups})
   }
 }
