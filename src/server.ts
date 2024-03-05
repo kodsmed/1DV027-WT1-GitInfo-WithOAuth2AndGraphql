@@ -62,25 +62,29 @@ try {
       defaultSrc: [
         "'self'",
         'gitlab.lnu.se',
-        'http://localhost'
+        'http://localhost',
+        'https://lagerapp.se'
       ],
 
       styleSrc: [
         "'self'",
         'http://localhost',
-        'https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css'
+        'https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css',
+        'https://lagerapp.se'
       ],
 
       scriptSrc: [
         "'self'",
         'http://localhost',
-        'https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js'
+        'https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js',
+        'https://lagerapp.se'
       ],
 
       imgSrc: [
         "'self'",
         'http://localhost',
-        'https://secure.gravatar.com'
+        'https://secure.gravatar.com',
+        'https://lagerapp.se'
       ]
     }
   }))
@@ -91,7 +95,7 @@ try {
    * @see see https://www.npmjs.com/package/cors#enabling-cors-pre-flight
    */
 
-  const allowedOrigins = ['http://localhost', 'https://gitlab.lnu.se', 'https://*.kodsmed.se']
+  const allowedOrigins = ['http://localhost', 'https://gitlab.lnu.se', 'https://lagerapp.se']
   app.use('*', cors({
     origin: allowedOrigins,
     credentials: true, // allow the cookies, important.
