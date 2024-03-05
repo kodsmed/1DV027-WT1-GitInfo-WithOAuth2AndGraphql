@@ -29,7 +29,6 @@ export default function createAuthRouter(
   // Thus allowing us to use the same base URL for additional OAuth2.0 providers, if we want to add more in the future.
   const port = serverOptions.port
   const host = gitlabApplicationSettings.host
-  const redirectURLBase = `http://localhost:${port}/auth/`;
   const scopes = ['read_user', 'read_api']
 
 
@@ -37,13 +36,20 @@ export default function createAuthRouter(
     // Redirect the user to the gitlab OAuth2.0 provider
     // This is not really needed, It could just be a link in the front end, but, as mentioned I prepared for multiple providers.
     // consequently, It does not have its own method in the controller either.
+
+    //Since we don't know where the server is running, we need to construct the redirect URL.
+    // Pull the protocol, host and base URL from the request object.
+    const redirectURLBase = req.protocol + '://' + req.get('host') + req.baseUrl + '/';
     const completeRedirectURL = redirectURLBase + 'gitlab-callback';
     const authURL = `${host}/oauth/authorize?client_id=${gitlabApplicationSettings.applicationID}&redirect_uri=${completeRedirectURL}&response_type=code&scope=${scopes.join('%20')}`;
     res.redirect(authURL);
   })
 
   // get gitlab-callback
-  authRouter.route('/gitlab-callback?').get(async (req: ExtendedRequest, res: express.Response, next: NextFunction) => {
+  authRouter.route('/gitlab-callback?').get(async (req, res: express.Response, next: NextFunction) => {
+    //Since we don't know where the server is running, we need to construct the redirect URL.
+    // Pull the protocol, host and base URL from the request object.
+    const redirectURLBase = req.protocol + '://' + req.get('host') + req.baseUrl + '/';
     const controller = container.get(TYPES.GitlabSessionController) as GitlabSessionController
     await controller.login(
       req, res, next,
