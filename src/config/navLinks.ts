@@ -1,11 +1,11 @@
 const nonAuthenticatedLinks = [
-  { href: '/auth/gitlab', text: 'Login with Gitlab' }
+  { href: './auth/gitlab', text: 'Login with Gitlab' }
 ];
 
 const authenticatedLinks = [
-  { href: '/activities', text: 'Activities' },
-  { href: '/groups', text: 'Groups' },
-  { href: '/auth/logout', text: 'Logout' }
+  { href: './activities', text: 'Activities' },
+  { href: './groups', text: 'Groups' },
+  { href: './auth/logout', text: 'Logout' }
 ];
 
 export const navLinks = {
