@@ -36,9 +36,9 @@ import { serverOptions } from './config/serverOptions.js';
 import { bootstrapViewEngine } from './config/bootstrapViewEngine.js';
 
 // Import middleware.
-import { authenticateSessionAndSetLinks } from './routes/middleware/authenticateSessionAndSetLinks.js';
-import { removeExpiredSessions } from './routes/middleware/removeExpiredSessions.js';
-import { refreshCurrentTokenIfNeeded } from './routes/middleware/refreshCurrentTokenIfNeeded.js';
+import { authenticateSessionAndSetLinks } from './middleware/authenticateSessionAndSetLinks.js';
+import { removeExpiredSessions } from './middleware/removeExpiredSessions.js';
+import { refreshCurrentTokenIfNeeded } from './middleware/refreshCurrentTokenIfNeeded.js';
 
 // Load extended types.
 import { ExtendedRequest } from './lib/types/req-extentions.js';
@@ -57,10 +57,47 @@ try {
   }
 
   // Set various HTTP headers to make the application little more secure (https://www.npmjs.com/package/helmet).
-  // app.use(helmet())
+  app.use(helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: [
+        "'self'",
+        'gitlab.lnu.se',
+        'http://localhost'
+      ],
 
-  // Enable Cross Origin Resource Sharing (CORS) (https://www.npmjs.com/package/cors).
-  // app.use(cors())
+      styleSrc: [
+        "'self'",
+        'http://localhost',
+        'https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css'
+      ],
+
+      scriptSrc: [
+        "'self'",
+        'http://localhost',
+        'https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js'
+      ],
+
+      imgSrc: [
+        "'self'",
+        'http://localhost',
+        'https://secure.gravatar.com'
+      ]
+    }
+  }))
+
+  /**
+   * Enable Cross Origin Resource Sharing (CORS) (https://www.npmjs.com/package/cors).
+   * The use of cookies require a more complex setup, including preflight requests.
+   * @see see https://www.npmjs.com/package/cors#enabling-cors-pre-flight
+   */
+
+  const allowedOrigins = ['http://localhost', 'https://gitlab.lnu.se', 'https://*.kodsmed.se']
+  app.use('*', cors({
+    origin: allowedOrigins,
+    credentials: true, // allow the cookies, important.
+    preflightContinue: true, // allow the preflight requests, important, see https://www.npmjs.com/package/cors#enabling-cors-pre-flight
+    optionsSuccessStatus: 204 // translate status 204 to 200. Needed for some old browsers.
+  }))
 
   // Parse requests of the content type application/json.
   app.use(express.json())
