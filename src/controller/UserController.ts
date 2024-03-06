@@ -35,7 +35,7 @@ export class UserController {
     res: express.Response,
     next: NextFunction,
     hostURL: string
-  ): Promise<UserData | void> {
+  ): Promise<UserData> {
 
     const token = this.gitlabSessionService.getSession(req.session.UUID).accessToken
 
@@ -104,13 +104,12 @@ export class UserController {
   /**
    * Fetches and Then Renders the user's data from the Gitlab API.
    */
-  async fetchAndRenderUserData(
+  async renderUserData(
     req: express.Request,
     res: express.Response,
     next: NextFunction,
-    hostURL: string,
+    userData: UserData,
   ) {
-    const userData = await this.fetchUserData(req, res, next, hostURL)
     const navLinks = req.navLinks
     const baseURL = req.baseUrl
     res.render('home/user', { baseURL, userData, navLinks })

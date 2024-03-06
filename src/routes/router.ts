@@ -56,8 +56,9 @@ export function createRouter(
   /**
    * The home route for authenticated users... non-authenticated users will be redirected to the default route by the auth middleware.
    */
-  router.route('/').get((req: express.Request, res: express.Response, next: express.NextFunction) => {
-    controller.fetchAndRenderUserData(req, res, next, gitlabApplicationSettings.host)
+  router.route('/').get(async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    const userData = await controller.fetchUserData(req, res, next, gitlabApplicationSettings.host)
+    controller.renderUserData(req, res, next, userData)
   })
 
   /**
@@ -71,17 +72,19 @@ export function createRouter(
    * The Activities route.
    * It does not get its own router because it is a flat route.
    */
-  router.route('/activities').get((req: express.Request, res: express.Response, next: express.NextFunction) => {
+  router.route('/activities').get(async (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const limit = 101
-    activityController.fetchAndRenderActivities(req, res, next, limit)
+    const activities = await activityController.getActivities(req, res, next, limit)
+    activityController.renderActivities(req, res, next, activities)
   })
 
   /**
    * The group route.
    * It does not get its own router because it is a flat route.
    */
-  router.route('/groups').get((req: express.Request, res: express.Response, next: express.NextFunction) => {
-    groupController.fetchAndRenderGroupData(req, res, next, activeSessions, gitlabApplicationSettings.host)
+  router.route('/groups').get(async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    const queryResult = await groupController.getGroups(req, res, next, activeSessions, gitlabApplicationSettings.host)
+    groupController.renderGroupData(req, res, next, activeSessions, queryResult)
   })
 
   /**

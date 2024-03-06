@@ -31,7 +31,7 @@ export class ActivityController {
    * @param {number} limit - The maximum number of activities to retrieve.
    * @returns {Activity[]} - The list of activities.
    */
-  async getActivities(req: express.Request, res: express.Response, next: express.NextFunction, limit: number) {
+  async getActivities(req: express.Request, res: express.Response, next: express.NextFunction, limit: number): Promise<Activity[]> {
     // Get the users access token
     const token = this.sessionService.getSession(req.session.UUID).accessToken
     const hostURL = gitlabApplicationSettings.host
@@ -108,17 +108,15 @@ export class ActivityController {
    * @param {express.Request} req - The request object.
    * @param {express.Response} res - The response object.
    * @param {express.NextFunction} next - The next function.
-   * @param {number} limit - The maximum number of activities to retrieve.
+   * @param {Activity[]} activities - The activities to render.
    * @throws {Error} - If the activities cannot be retrieved.
    */
-  async fetchAndRenderActivities(
+  async renderActivities(
     req: express.Request,
     res: express.Response,
     next: express.NextFunction,
-    limit: number) {
-      let activities = [] as Activity[]
+    activities: Activity[]) {
     try {
-      activities = await this.getActivities(req, res, next, limit) as Activity[]
       const baseURL = req.baseUrl
       const navLinks = req.navLinks
       res.render('activities/activities', { baseURL, activities, navLinks })
