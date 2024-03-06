@@ -1,5 +1,5 @@
 /**
- * Extends the JSON object with decycle and retrocycle methods
+ * Extends (decorates) the JSON object with decycle and retrocycle methods used by the logger
  * from the json-js-cycle package.
  *
  * @module json-extentions

@@ -5,7 +5,6 @@
 
 import { Express, Response, Locals } from 'express'
 import { join } from 'path'
-import { serverOptions } from './serverOptions.js';
 import expressLayouts from 'express-ejs-layouts'
 import { ServerOptions } from '../lib/types/serverOptions.js';
 

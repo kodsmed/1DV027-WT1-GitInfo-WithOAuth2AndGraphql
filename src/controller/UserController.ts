@@ -1,5 +1,6 @@
 /**
  * User Controller... Responsible for fetching the user's data from the Gitlab API.
+ * Consequently, it is also responsible for rendering the user's data, that is the home page.
  */
 
 // Import packages

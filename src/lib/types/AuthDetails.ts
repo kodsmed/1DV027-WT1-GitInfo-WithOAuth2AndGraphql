@@ -4,7 +4,7 @@
  * The object is immutable after creation.
  *
  * @module AuthDetails
- * @version 0.0.1
+ * @version 1.0.0
  */
 
 export class AuthDetails{
@@ -33,6 +33,9 @@ export class AuthDetails{
   }
 }
 
+/**
+ * Specialized AuthDetails object that represents an empty object.
+ */
 export class NullAuthDetails extends AuthDetails {
   constructor() {
     super("", "", "", 0)

@@ -1,7 +1,6 @@
 /**
  * This service is responsible for managing the Gitlab sessions.
  * @module GitlabSessionService
- * @NOTE SIDE EFFECT: Every action taken will clear expired sessions.
  * @author Jimmy Karlsson <jk224jv@student.lnu.se>
  */
 import { AuthDetails, NullAuthDetails } from '../lib/types/AuthDetails.js'

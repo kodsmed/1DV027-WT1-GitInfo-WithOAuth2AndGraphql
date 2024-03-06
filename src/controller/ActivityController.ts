@@ -5,7 +5,7 @@ import express from 'express'
 
 // Import modules
 import { GitlabSessionService } from '../services/GitlabSessionService.js'
-import { ExtendedRequest } from '../lib/types/req-extentions.js'
+import { ExtendedRequest } from '../lib/types/req-extentions.js' // appears to be unused but is required for the decorator to work
 import { UserController } from './UserController.js'
 import { container, TYPES } from '../config/inversify.config.js'
 import { UserData } from '../models/UserData.js'
@@ -31,7 +31,7 @@ export class ActivityController {
    * @param {number} limit - The maximum number of activities to retrieve.
    * @returns {Activity[]} - The list of activities.
    */
-  async getActivities(req: ExtendedRequest, res: express.Response, next: express.NextFunction, limit: number) {
+  async getActivities(req: express.Request, res: express.Response, next: express.NextFunction, limit: number) {
     // Get the users access token
     const token = this.sessionService.getSession(req.session.UUID).accessToken
     const hostURL = gitlabApplicationSettings.host
@@ -41,8 +41,7 @@ export class ActivityController {
     const userController = container.get<UserController>(TYPES.UserController)
     const user = await userController.fetchUserData(req, res, next, hostURL) as UserData
     const userId = user.gitLabID
-    // Not used, but could be used to filter activities by user since gitlab API does not do that. see line 70.
-    // const userName = user.username
+
 
     // fetch 10 activities at a time until we have the required number of activities
     let page = 1
@@ -67,13 +66,6 @@ export class ActivityController {
       if (activities.length === 0) {
         break
       } else {
-      // Gitlab API does not filter activities by user, so we have to do it here, we can do that here, but its not my problem.
-      // Doing so messes up the pagination, and will not result in the hard requirement of 101 activities.
-      // for (const activity of activities) {
-      //   if (activity.author_username === userName) {
-      //     allActivities.push(activity)
-      //   }
-      //}
       allActivities.push(...activities)
       }
       page++

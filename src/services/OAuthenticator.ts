@@ -5,8 +5,6 @@
  * @author Jimmy Karlsson <jk224jv@student.lnu.se>
  * @version 1.0.0
  */
-
-import express, { NextFunction } from "express"
 import { AuthDetails } from "../lib/types/AuthDetails.js"
 import { GitlabApplicationSettings } from "../lib/types/GitlabApplicationSettings.js"
 

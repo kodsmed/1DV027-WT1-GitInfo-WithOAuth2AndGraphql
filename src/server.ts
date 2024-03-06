@@ -170,7 +170,7 @@ try {
   app.use((err: ExtendedError, req: Request, res: Response, next: NextFunction) => {
     logger.error(err.message, { error: err })
 
-    if (process.env.NODE_ENV !== 'production') {
+    if (process.env.NODE_ENV === 'production') {
       // Ensure a valid status code is set for the error.
       // If the status code is not provided, default to 500 (Internal Server Error).
       // This prevents leakage of sensitive error details to the client.

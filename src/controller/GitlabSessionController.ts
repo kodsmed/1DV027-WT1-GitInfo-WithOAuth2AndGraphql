@@ -54,7 +54,7 @@ export class GitlabSessionController {
       return
     }
 
-    // constuct the redirect URL
+    // construct the redirect URL
     const redirectURL = req.protocol + '://' + req.get('host') + serverOptions.baseURL + '/'
 
     // Create a new OAuthenticator instance

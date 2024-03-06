@@ -1,5 +1,5 @@
 /**
- * Extends the request object and Gives the request object a new properties.
+ * Extends (decorates) the request object and by giving the request object a new properties.
  * @property {string} requestUuid - A unique identifier for the request.
  * @property {string} code - The current request's session ID towards gitlab, if available.
  * @property {string} token - The current request's token towards gitlab, if available.

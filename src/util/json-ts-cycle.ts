@@ -26,12 +26,16 @@ declare global {
   }
 }
 
+/**
+ * Decorates the JSON object with decycle method.
+ */
 JSON.decycle = function decycle(object: any, options: DecycleOptions = {}): any {
   options.replacer = options.replacer || undefined;
   options.includeNonEnumerableProperties = options.includeNonEnumerableProperties || false;
 
   var objects = new WeakMap<object, string>(); // object to path mappings
 
+  // I have no idea what a de-rez is, it was named by the original author.
   return (function derez(value: any, path: string): any {
     var old_path: string | undefined; // The path of an earlier occurrence of value
     var nu: any; // The new object or array
@@ -77,11 +81,15 @@ JSON.decycle = function decycle(object: any, options: DecycleOptions = {}): any 
   })(object, "$");
 };
 
+/**
+ * Decorates the JSON object with retrocycle method.
+ */
 JSON.retrocycle = function retrocycle($: any): any {
   "use strict";
 
   var px = /^\$(?:\[(?:\d+|"(?:[^\\"\u0000-\u001f]|\\(?:[\\"\/bfnrt]|u[0-9a-zA-Z]{4}))*")\])*$/;
 
+  // I have no idea what a rez is, it was named by the original author.
   (function rez(value: any): void {
     if (value && typeof value === "object") {
       if (Array.isArray(value)) {
