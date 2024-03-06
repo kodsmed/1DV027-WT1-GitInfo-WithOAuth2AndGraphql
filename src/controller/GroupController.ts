@@ -49,6 +49,9 @@ export class GroupController {
                             lastCommit {
                               committedDate
                               committerName
+                              author{
+                                username
+                              }
                               authorGravatar
                               descriptionHtml
                             }

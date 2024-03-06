@@ -62,6 +62,7 @@ export class GraphQlGroupQueryParser {
         project.lastCommitOnDateString = date
         project.lastCommitOnTimeString = time.split('.')[0];
         project.lastCommitAuthor = this.sanitize(lastCommit.committerName) || "&nbsp;-&nbsp;"
+        project.lastCommitAuthor += ', ' + this.sanitize(lastCommit.author.username) || "&nbsp;-&nbsp;"
         project.lastCommitAuthorAvatarURL = this.sanitize(lastCommit.authorGravatar) || "images/default-avatar.png"
         project.projectAvatarURL = this.sanitize(projectNode.avatarUrl) || "images/default-avatar.png"
 
