@@ -84,12 +84,19 @@ export class UserController {
     const currentUser = data.data.currentUser
     // split id on the last slash and take the last part
     const id = currentUser.id.split('/').pop()
+
+    //gitlab and gravatar avatars urls are returned in different formats so we need to check and adjust. If it's not a gravatar url, we need to add the host url to the avatar url.
+    let avatarUrl = currentUser.avatarUrl || 'images/default-avatar.png'
+    if (avatarUrl.startsWith('/uploads/')) {
+      avatarUrl = hostURL + avatarUrl
+    }
+
     return new UserData(
       id || ' - ',
       currentUser.username || ' - ',
       currentUser.name || ' - ',
       currentUser.emails.edges[0].node.email || ' - ',
-      currentUser.avatarUrl || '/images/default-avatar.png',
+      avatarUrl,
       currentUser.lastActivityOn || ' - '
     )
   }
