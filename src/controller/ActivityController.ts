@@ -46,7 +46,7 @@ export class ActivityController {
 
     // fetch 10 activities at a time until we have the required number of activities
     let page = 1
-    const perPage = 10
+    const perPage = 20
     while (allActivities.length < limit) {
       let pagesThisRun = 0
       if (limit - allActivities.length < perPage) {
@@ -55,7 +55,7 @@ export class ActivityController {
         pagesThisRun = perPage;
       }
       // Fetch the activities. The it should include all activities, not just the ones the user has done, so scope=all. Remove scope=all to only get the user's activities.
-      const result = await fetch(`${hostURL}/api/v4/users/${userId}/events?page=${page}&per_page=${pagesThisRun}&scope=all`, {
+      const result = await fetch(`${hostURL}/api/v4/users/${userId}/events?&page=${page}&per_page=${pagesThisRun}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
